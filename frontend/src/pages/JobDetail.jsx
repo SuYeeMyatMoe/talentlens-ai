@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Upload, FileText, CheckCircle2, AlertCircle, Clock, Users } from "lucide-react";
+import { ArrowLeft, Upload, CheckCircle2, Clock, Users } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 import { jobsAPI, applicationsAPI } from "../api/client";
 import Sidebar from "../components/Sidebar";
@@ -23,18 +23,7 @@ export default function JobDetail() {
     }).catch(console.error);
   }, [jobId]);
 
-  const apply = async () => {
-    try {
-      const { data } = await applicationsAPI.apply({ job_id: parseInt(jobId) });
-      setMyApp(data);
-      toast.success("Applied successfully! Now upload your resume.");
-    } catch (err) {
-      toast.error(err.response?.data?.detail || "Application failed");
-    }
-  };
-
   const onDrop = useCallback(async (files) => {
-    if (!myApp) { toast.error("Apply first before uploading resume"); return; }
     if (!files[0]) return;
     const f = files[0];
     if (!["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"].includes(f.type)) {
@@ -42,13 +31,19 @@ export default function JobDetail() {
     }
     setUploading(true);
     try {
-      const { data } = await applicationsAPI.uploadResume(myApp.id, f);
-      setParsed(data.parsed);
-      toast.success("Resume uploaded and parsed successfully!");
+      let appId = myApp?.id;
+      if (!appId) {
+        const { data: applyData } = await applicationsAPI.apply({ job_id: parseInt(jobId) });
+        appId = applyData.id;
+        setMyApp(applyData);
+      }
+      const { data: uploadData } = await applicationsAPI.uploadResume(appId, f);
+      setParsed(uploadData.parsed);
+      toast.success("Application submitted successfully!");
     } catch (err) {
       toast.error(err.response?.data?.detail || "Upload failed");
     } finally { setUploading(false); }
-  }, [myApp]);
+  }, [myApp, jobId]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, accept: { "application/pdf": [".pdf"], "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"] }, maxFiles: 1 });
 
@@ -94,12 +89,29 @@ export default function JobDetail() {
           </div>
 
           {/* Apply / Upload */}
-          {!myApp ? (
-            <div className="card p-6 text-center">
-              <FileText className="w-12 h-12 text-primary-200 mx-auto mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-2">Interested in this role?</h3>
-              <p className="text-sm text-gray-500 mb-4">Click Apply to create your application, then upload your resume.</p>
-              <button onClick={apply} className="btn-primary mx-auto">Apply Now</button>
+          {!myApp?.resume && !parsed ? (
+            <div className="card p-6">
+              <h3 className="font-semibold text-gray-900 mb-4">
+                {myApp ? `Application #${myApp.id}` : "Apply for this role"}
+              </h3>
+              <p className="text-sm text-gray-500 mb-4">Upload your resume (PDF or DOCX). Your name and email are taken from your account — no need to include them.</p>
+              <div {...getRootProps()} className={`border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all
+                ${isDragActive ? "border-primary-400 bg-primary-50" : "border-gray-200 hover:border-primary-300 hover:bg-gray-50"}`}>
+                <input {...getInputProps()} />
+                {uploading ? (
+                  <div>
+                    <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                    <p className="text-sm text-gray-500">Processing application…</p>
+                  </div>
+                ) : (
+                  <div>
+                    <Upload className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+                    <p className="text-sm font-medium text-gray-700">{isDragActive ? "Drop it here!" : "Drag & drop your resume to apply"}</p>
+                    <p className="text-xs text-gray-400 mt-1">PDF or DOCX · Max 10MB</p>
+                    <button type="button" className="btn-primary mt-4 mx-auto text-xs py-2">Select File to Apply</button>
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
             <div className="card p-6">
@@ -108,31 +120,6 @@ export default function JobDetail() {
                 <h3 className="font-semibold text-gray-900">Application #{myApp.id}</h3>
                 <span className="badge-green ml-auto">Applied</span>
               </div>
-
-              {/* Resume upload */}
-              {!myApp.resume && !parsed && (
-                <div>
-                  <p className="text-sm text-gray-500 mb-4">Upload your resume (PDF or DOCX). Your name and email are taken from your account — no need to include them.</p>
-                  <div {...getRootProps()} className={`border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all
-                    ${isDragActive ? "border-primary-400 bg-primary-50" : "border-gray-200 hover:border-primary-300 hover:bg-gray-50"}`}>
-                    <input {...getInputProps()} />
-                    {uploading ? (
-                      <div>
-                        <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                        <p className="text-sm text-gray-500">Parsing resume…</p>
-                      </div>
-                    ) : (
-                      <div>
-                        <Upload className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-                        <p className="text-sm font-medium text-gray-700">{isDragActive ? "Drop it here!" : "Drag & drop your resume"}</p>
-                        <p className="text-xs text-gray-400 mt-1">PDF or DOCX · Max 10MB</p>
-                        <button type="button" className="btn-primary mt-4 mx-auto text-xs py-2">Browse Files</button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
               {/* Parsed result */}
               {parsed && (
                 <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}

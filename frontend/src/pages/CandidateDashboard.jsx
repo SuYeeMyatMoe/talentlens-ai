@@ -45,17 +45,6 @@ export default function CandidateDashboard() {
     }
   };
 
-  const applyToJob = async (jobId) => {
-    try {
-      await applicationsAPI.apply({ job_id: jobId });
-      toast.success("Application submitted!");
-      const [apps] = await Promise.all([applicationsAPI.myApplications()]);
-      setMyApps(apps.data);
-    } catch (err) {
-      toast.error(err.response?.data?.detail || "Application failed");
-    }
-  };
-
   const statusConfig = {
     applied: { icon: Clock, color: "text-gray-400", bg: "bg-gray-50", label: "Applied" },
     under_review: { icon: Sparkles, color: "text-blue-500", bg: "bg-blue-50", label: "Under Review" },
@@ -199,9 +188,9 @@ export default function CandidateDashboard() {
                           </span>
                         );
                       })() : (
-                        <button onClick={() => applyToJob(job.id)} className="btn-primary py-1.5 px-4 text-xs">
+                        <Link to={`/candidate/job/${job.id}`} className="btn-primary py-1.5 px-4 text-xs">
                           Apply Now
-                        </button>
+                        </Link>
                       )}
                       <Link to={`/candidate/job/${job.id}`} className="btn-outline py-1.5 px-3 text-xs">
                         Details
