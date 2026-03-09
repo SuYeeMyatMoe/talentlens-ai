@@ -41,6 +41,8 @@ async def run_ai_analysis(job_id: int, db: AsyncSession = Depends(get_db), admin
     job = job_result.scalar_one_or_none()
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
+    if job.created_by != admin.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
 
     # Get all applications with resumes
     apps_result = await db.execute(
@@ -127,15 +129,15 @@ async def run_ai_analysis(job_id: int, db: AsyncSession = Depends(get_db), admin
 
 @router.get("/dashboard-stats", response_model=DashboardStats)
 async def dashboard_stats(db: AsyncSession = Depends(get_db), admin: User = Depends(get_current_admin)):
-    total_candidates = (await db.execute(select(func.count(User.id)).where(User.role == "candidate"))).scalar() or 0
-    total_jobs = (await db.execute(select(func.count(Job.id)))).scalar() or 0
-    shortlisted = (await db.execute(select(func.count(Application.id)).where(Application.status == "shortlisted"))).scalar() or 0
-    rejected = (await db.execute(select(func.count(Application.id)).where(Application.status == "rejected"))).scalar() or 0
-    pending = (await db.execute(select(func.count(Application.id)).where(Application.status.in_(["applied", "under_review"])))).scalar() or 0
-    avg_fairness = (await db.execute(select(func.avg(BiasReport.fairness_score)))).scalar() or 0
+    total_candidates = (await db.execute(select(func.count(func.distinct(Application.user_id))).join(Job, Job.id == Application.job_id).where(Job.created_by == admin.id))).scalar() or 0
+    total_jobs = (await db.execute(select(func.count(Job.id)).where(Job.created_by == admin.id))).scalar() or 0
+    shortlisted = (await db.execute(select(func.count(Application.id)).join(Job, Job.id == Application.job_id).where(Application.status == "shortlisted", Job.created_by == admin.id))).scalar() or 0
+    rejected = (await db.execute(select(func.count(Application.id)).join(Job, Job.id == Application.job_id).where(Application.status == "rejected", Job.created_by == admin.id))).scalar() or 0
+    pending = (await db.execute(select(func.count(Application.id)).join(Job, Job.id == Application.job_id).where(Application.status.in_(["applied", "under_review"]), Job.created_by == admin.id))).scalar() or 0
+    avg_fairness = (await db.execute(select(func.avg(BiasReport.fairness_score)).join(Application, BiasReport.application_id == Application.id).join(Job, Application.job_id == Job.id).where(Job.created_by == admin.id))).scalar() or 0
 
-    # Score distribution buckets
-    scores_result = await db.execute(select(Ranking.final_score))
+    # Score distribution buckets for this admin's jobs
+    scores_result = await db.execute(select(Ranking.final_score).join(Application, Ranking.application_id == Application.id).join(Job, Application.job_id == Job.id).where(Job.created_by == admin.id))
     scores = [r[0] for r in scores_result.fetchall() if r[0] is not None]
     buckets = {"0-20": 0, "21-40": 0, "41-60": 0, "61-80": 0, "81-100": 0}
     for s in scores:

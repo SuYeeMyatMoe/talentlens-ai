@@ -105,7 +105,7 @@ export default function JobDetail() {
             <div className="card p-6">
               <div className="flex items-center gap-2 mb-4">
                 <CheckCircle2 className="w-4 h-4 text-green-500" />
-                <h3 className="font-semibold text-gray-900">Application #{ myApp.id }</h3>
+                <h3 className="font-semibold text-gray-900">Application #{myApp.id}</h3>
                 <span className="badge-green ml-auto">Applied</span>
               </div>
 
@@ -144,8 +144,6 @@ export default function JobDetail() {
                   <div className="space-y-2 text-sm">
                     <div><span className="font-medium text-gray-700">Skills: </span><span className="text-gray-600">{parsed.skills?.join(", ")}</span></div>
                     <div><span className="font-medium text-gray-700">Experience: </span><span className="text-gray-600">{parsed.experience_years} years</span></div>
-                    <div><span className="font-medium text-gray-700">Education: </span><span className="text-gray-600">{parsed.education}</span></div>
-                    <div><span className="font-medium text-gray-700">Projects: </span><span className="text-gray-600">{parsed.projects?.length} detected</span></div>
                   </div>
                 </motion.div>
               )}

@@ -33,9 +33,22 @@ export default function Login() {
     }
   };
 
-  const fillDemo = (role) => {
-    if (role === "admin") setForm({ email: "admin@talentlens.ai", password: "admin123" });
-    else setForm({ email: "candidate@demo.com", password: "demo123" });
+  const handleDemoLogin = async (role) => {
+    const demoEmail = role === "admin" ? "admin@talentlens.ai" : "candidate@demo.com";
+    const demoPassword = role === "admin" ? "admin123" : "demo123";
+
+    setForm({ email: demoEmail, password: demoPassword });
+    setLoading(true);
+    try {
+      const user = await login(demoEmail, demoPassword);
+      toast.success(`Welcome back, ${user.name.split(" ")[0]}!`);
+      navigate(user.role === "admin" ? "/recruiter" : "/candidate");
+    } catch (err) {
+      console.error(err);
+      toast.error(role === "admin" ? "Admin demo user not found. Please register as a Recruiter first." : "Demo user not found");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

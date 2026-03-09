@@ -18,7 +18,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 @router.get("/", response_model=List[JobResponse])
 async def list_jobs(db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
     if current_user.role == "admin":
-        result = await db.execute(select(Job).order_by(Job.created_at.desc()))
+        result = await db.execute(select(Job).where(Job.created_by == current_user.id).order_by(Job.created_at.desc()))
     else:
         result = await db.execute(select(Job).where(Job.published == True).order_by(Job.created_at.desc()))
     jobs = result.scalars().all()
@@ -49,6 +49,10 @@ async def get_job(job_id: int, db: AsyncSession = Depends(get_db), current_user:
     job = result.scalar_one_or_none()
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
+    if current_user.role == "admin" and job.created_by != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to view this job")
+    if current_user.role == "candidate" and not job.published:
+        raise HTTPException(status_code=404, detail="Job not found")
     count_result = await db.execute(select(func.count(Application.id)).where(Application.job_id == job_id))
     job_data = JobResponse.model_validate(job)
     job_data.application_count = count_result.scalar() or 0
@@ -61,6 +65,8 @@ async def update_job(job_id: int, data: JobUpdate, db: AsyncSession = Depends(ge
     job = result.scalar_one_or_none()
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
+    if job.created_by != admin.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
     for k, v in data.model_dump(exclude_none=True).items():
         setattr(job, k, v)
     await db.commit()
@@ -74,6 +80,8 @@ async def delete_job(job_id: int, db: AsyncSession = Depends(get_db), admin: Use
     job = result.scalar_one_or_none()
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
+    if job.created_by != admin.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
     await db.delete(job)
     await db.commit()
     return {"message": "Job deleted"}
@@ -85,6 +93,8 @@ async def upload_resumes_bulk(job_id: int, files: List[UploadFile] = File(...), 
     job = job_result.scalar_one_or_none()
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
+    if job.created_by != admin.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
         
     from app.services.resume_parser import parse_resume
     

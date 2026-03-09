@@ -142,27 +142,57 @@ def extract_experience_years(text: str) -> float:
 def extract_projects(text: str) -> List[str]:
     projects = []
     lines = text.split('\n')
+    project_markers = ["developed", "built", "created", "designed", "implemented", "project:", "led", "architected"]
     for line in lines:
         line = line.strip()
         if not line:
             continue
+        line_lower = line.lower()
+        has_bullet = re.match(r'^[-•*]\s+.{10,}', line)
+        has_verb = any(m in line_lower for m in project_markers) and len(line) > 15
+        is_phrase = len(line) > 10 and len(line) < 150 and line[0].isupper()
+        
         # Look for project-like patterns
-        if re.match(r'^[-•*]\s+.{10,}', line) or (len(line) > 10 and len(line) < 100 and line[0].isupper()):
+        if has_bullet or has_verb or is_phrase:
             cleaned = re.sub(r'^[-•*]\s+', '', line).strip()
-            if cleaned and len(cleaned) > 5:
+            if cleaned and 10 < len(cleaned) < 300:
                 projects.append(cleaned)
-    return projects[:10]
+                
+    # Remove duplicates but preserve order
+    seen = set()
+    unique_projects = []
+    for p in projects:
+        if p not in seen:
+            seen.add(p)
+            unique_projects.append(p)
+            
+    return unique_projects[:10]
 
 
 def extract_education(text: str) -> str:
     lines = text.split('\n')
-    for line in lines:
+    educations = []
+    extended_keywords = EDUCATION_KEYWORDS + [
+        "university", "college", "institute", "degree", 
+        "diploma", "school", "academy", "certification"
+    ]
+    
+    for i, line in enumerate(lines):
         line_lower = line.lower()
-        if any(kw in line_lower for kw in EDUCATION_KEYWORDS):
+        if any(kw in line_lower for kw in extended_keywords):
             cleaned = line.strip()
             if 5 < len(cleaned) < 200:
-                return cleaned
-    return ""
+                ed_item = cleaned
+                # Include next line for context (dates, major etc.)
+                if i + 1 < len(lines):
+                    next_line = lines[i+1].strip()
+                    if 0 < len(next_line) < 100:
+                        ed_item += " - " + next_line
+                
+                if not any(e in ed_item or ed_item in e for e in educations):
+                    educations.append(ed_item)
+                    
+    return " | ".join(educations[:3]) if educations else ""
 
 
 async def parse_resume(filepath: str, content_type: str) -> Dict[str, Any]:
@@ -186,7 +216,13 @@ async def parse_resume(filepath: str, content_type: str) -> Dict[str, Any]:
     skills = extract_skills(skills_text)
 
     experience_years = extract_experience_years(sections["experience"] + " " + cleaned)
-    projects = extract_projects(sections["projects"])
+    
+    projects_text = sections["projects"]
+    if not projects_text.strip():
+        # Fallback to experience + raw if not found explicitly
+        projects_text = sections["experience"] + " " + cleaned
+    projects = extract_projects(projects_text)
+    
     education = extract_education(sections["education"] + " " + cleaned)
 
     return {

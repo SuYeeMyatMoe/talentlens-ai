@@ -32,6 +32,19 @@ export default function CandidateDashboard() {
   const unread = notifications.filter(n => !n.read_status).length;
   const applied = myApps.map(a => a.job_id);
 
+  const handleNotificationClick = async (notif) => {
+    if (!notif.read_status) {
+      setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read_status: true } : n));
+      try {
+        await notificationsAPI.markRead(notif.id);
+      } catch (err) {
+        console.error("Failed to mark as read", err);
+        // Provide rollback on failure if needed
+        setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read_status: false } : n));
+      }
+    }
+  };
+
   const applyToJob = async (jobId) => {
     try {
       await applicationsAPI.apply({ job_id: jobId });
@@ -140,7 +153,7 @@ export default function CandidateDashboard() {
                 {notifications.length === 0 ? (
                   <div className="p-8 text-center text-gray-400">No notifications yet</div>
                 ) : notifications.slice(0, showNotifsTab ? undefined : 5).map((n) => (
-                  <div key={n.id} className={`px-6 py-4 flex items-start gap-3 ${!n.read_status ? "bg-primary-50/40" : ""}`}>
+                  <div key={n.id} onClick={() => handleNotificationClick(n)} className={`px-6 py-4 flex items-start gap-3 cursor-pointer hover:bg-gray-50 transition-colors ${!n.read_status ? "bg-primary-50/40" : ""}`}>
                     <div className={`w-2 h-2 rounded-full mt-2 shrink-0 ${!n.read_status ? "bg-primary-500" : "bg-gray-200"}`} />
                     <div>
                       <div className="font-medium text-gray-900 text-sm">{n.title}</div>

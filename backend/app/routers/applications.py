@@ -130,6 +130,11 @@ async def my_applications(db: AsyncSession = Depends(get_db), current_user: User
 
 @router.get("/job/{job_id}", response_model=List[CandidateDetailResponse])
 async def get_job_candidates(job_id: int, db: AsyncSession = Depends(get_db), admin: User = Depends(get_current_admin)):
+    job_result = await db.execute(select(Job).where(Job.id == job_id))
+    job = job_result.scalar_one_or_none()
+    if not job or job.created_by != admin.id:
+        raise HTTPException(status_code=403, detail="Not authorized to view candidates for this job")
+        
     result = await db.execute(
         select(Application)
         .options(
@@ -179,6 +184,13 @@ async def get_candidate_detail(application_id: int, db: AsyncSession = Depends(g
     # Candidates can only see their own
     if current_user.role == "candidate" and app.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Admins can only see applications for jobs they created
+    if current_user.role == "admin":
+        job_result = await db.execute(select(Job).where(Job.id == app.job_id))
+        job = job_result.scalar_one_or_none()
+        if not job or job.created_by != current_user.id:
+            raise HTTPException(status_code=403, detail="Access denied. You did not create this job.")
 
     decision_made = app.status in ["shortlisted", "rejected"]
     return CandidateDetailResponse(
@@ -206,6 +218,11 @@ async def make_decision(application_id: int, data: DecisionRequest,
     app = result.scalar_one_or_none()
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")
+
+    job_result = await db.execute(select(Job).where(Job.id == app.job_id))
+    job = job_result.scalar_one_or_none()
+    if not job or job.created_by != admin.id:
+        raise HTTPException(status_code=403, detail="Not authorized. You did not create this job.")
 
     app.status = data.decision.value
 
