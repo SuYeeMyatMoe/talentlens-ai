@@ -1,0 +1,22 @@
+2026-03-09 02:12:27,901 INFO sqlalchemy.engine.Engine SELECT DATABASE()
+2026-03-09 02:12:27,901 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-03-09 02:12:27,903 INFO sqlalchemy.engine.Engine SELECT @@sql_mode
+2026-03-09 02:12:27,903 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-03-09 02:12:27,905 INFO sqlalchemy.engine.Engine SELECT @@lower_case_table_names
+2026-03-09 02:12:27,905 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-03-09 02:12:27,908 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-03-09 02:12:27,961 INFO sqlalchemy.engine.Engine SELECT users.id, users.name, users.email, users.password_hash, users.`role`, users.created_at 
+FROM users 
+WHERE users.email = %s
+2026-03-09 02:12:27,961 INFO sqlalchemy.engine.Engine [generated in 0.00064s] ('admin@talentlens.ai',)
+Found user: admin@talentlens.ai $2b$12$MRWT9kOX32aE/7pQVYeXk.aAY3XLFCcnZ2W5xyJUlzeP2CUviFQFi
+Password valid? True
+2026-03-09 02:12:28,634 INFO sqlalchemy.engine.Engine ROLLBACK
+Exception ignored in: <function Connection.__del__ at 0x000002973CD68790>
+Traceback (most recent call last):
+  File "C:\Hackathon\talentlens-ai\backend\venv310\lib\site-packages\aiomysql\connection.py", line 1131, in __del__
+  File "C:\Hackathon\talentlens-ai\backend\venv310\lib\site-packages\aiomysql\connection.py", line 339, in close
+  File "C:\Users\hp\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 109, in close
+  File "C:\Users\hp\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 753, in call_soon
+  File "C:\Users\hp\AppData\Local\Programs\Python\Python310\lib\asyncio\base_events.py", line 515, in _check_closed
+RuntimeError: Event loop is closed
