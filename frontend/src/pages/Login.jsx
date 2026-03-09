@@ -26,7 +26,7 @@ export default function Login() {
       } else if (typeof detail === "string") {
         toast.error(detail);
       } else {
-        toast.error("Invalid credentials");
+        toast.error("Incorrect email or password");
       }
     } finally {
       setLoading(false);

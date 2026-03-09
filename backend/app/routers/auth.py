@@ -34,8 +34,10 @@ async def register(data: UserRegister, db: AsyncSession = Depends(get_db)):
 async def login(data: UserLogin, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.email == data.email))
     user = result.scalar_one_or_none()
-    if not user or not verify_password(data.password, user.password_hash):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    if not user:
+        raise HTTPException(status_code=401, detail="there is not user with that email and password")
+    if not verify_password(data.password, user.password_hash):
+        raise HTTPException(status_code=401, detail="Incorrect email or password")
 
     token = create_access_token({"sub": str(user.id), "role": user.role})
     return Token(access_token=token, token_type="bearer", user=UserResponse.model_validate(user))
