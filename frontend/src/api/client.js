@@ -3,8 +3,7 @@ import axios from "axios";
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 const api = axios.create({
-  baseURL: API_BASE,
-  headers: { "Content-Type": "application/json" },
+  baseURL: API_BASE
 });
 
 // Attach token
@@ -41,7 +40,12 @@ export const jobsAPI = {
   create: (data) => api.post("/api/jobs/", data),
   update: (id, data) => api.put(`/api/jobs/${id}`, data),
   delete: (id) => api.delete(`/api/jobs/${id}`),
-  uploadResumes: (jobId, formData) => api.post(`/api/jobs/${jobId}/upload-resumes`, formData),
+
+  // file upload endpoint
+  uploadResumes: (jobId, formData) =>
+    api.post(`/api/jobs/${jobId}/upload-resumes`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
 };
 
 // ─── Applications ──────────────────────────────────────────────────────────────
@@ -50,11 +54,17 @@ export const applicationsAPI = {
   myApplications: () => api.get("/api/applications/my"),
   getJobCandidates: (jobId) => api.get(`/api/applications/job/${jobId}`),
   getDetail: (id) => api.get(`/api/applications/${id}`),
+
+  // FIXED: resume upload
   uploadResume: (appId, file) => {
     const form = new FormData();
     form.append("file", file);
-    return api.post(`/api/applications/${appId}/upload-resume`, form);
+
+    return api.post(`/api/applications/${appId}/upload-resume`, form, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
   },
+
   makeDecision: (appId, decision) =>
     api.post(`/api/applications/${appId}/decision`, { decision }),
 };
