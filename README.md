@@ -1,11 +1,20 @@
 <h1 align="center">🔍 TalentLens AI: The Future of Fair Recruitment</h1>
 <div align="center">
 
-### 🎥 Demo Presentation
-[![Watch the Demo](https://img.youtube.com/vi/c-3yRsB1Ug4/maxresdefault.jpg)](https://youtu.be/c-3yRsB1Ug4)
+### 🎥 Live Demo Presentation
+
+▶ **Watch the full platform demo here:**  
+https://youtu.be/c-3yRsB1Ug4
+
+<br>
+
+<a href="https://youtu.be/c-3yRsB1Ug4">
+<img src="https://img.shields.io/badge/▶_Watch_Full_Demo-YouTube-red?style=for-the-badge&logo=youtube">
+</a>
 
 </div>
 
+---
 <div align="center">
 
 ![Status](https://img.shields.io/badge/Status-Hackathon_Ready-7c3aed?style=for-the-badge&logo=github)
