@@ -33,7 +33,6 @@ Early **Figma concept** used to visualize the TalentLens AI interface and user f
 </a>
 
 </div>
----
 
 <div align="center">
 
