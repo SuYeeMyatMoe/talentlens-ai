@@ -18,28 +18,28 @@
 ## 📸 Platform Preview
 
 ### 🏠 Landing Page
-<img src="UI_Images/HomePage.png" width="850" alt="TalentLens Landing Page"/>
+<img src="./projectUI_images/HomePage.png" width="850" alt="TalentLens Landing Page"/>
 
 *Modern, accessible entry point for both Candidates and Recruiters.*
 
 ---
 
 ### 📊 Recruiter Dashboard and Analytics
-<img src="UI_Images/RecruiterDashboard.png" width="850" alt="Recruiter Dashboard"/>
+<img src="./projectUI_images/RecruiterDashboard.png" width="850" alt="Recruiter Dashboard"/>
 
 *At-a-glance hiring funnels, score distributions, and one-click AI analysis.*
 
 ---
 
 ### 🧠 Explainable AI Analysis
-<img src="UI_Images/Resume_AiAnalysis.png" width="850" alt="AI Ranking Logic"/>
+<img src="./projectUI_images/Resume_AiAnalysis.png" width="850" alt="AI Ranking Logic"/>
 
 *Identity-free semantic scoring with transparent, human-readable feedback.*
 
 ---
 
 ### ⛓️ Blockchain-Verified Decisions
-<img src="UI_Images/Resume_AiAnalysiswithBlockchain_AfterDecision.png" width="850" alt="Blockchain Verification"/>
+<img src="./projectUI_images/Resume_AiAnalysiswithBlockchain_AfterDecision.png" width="850" alt="Blockchain Verification"/>
 
 *Every decision is securely hashed to the Polygon network for an immutable audit trail.*
 
