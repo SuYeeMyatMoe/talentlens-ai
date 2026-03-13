@@ -16,15 +16,15 @@ https://youtu.be/c-3yRsB1Ug4
 
 ---
 
-## 📐 UI Prototype (Design Concept)
+## 📐 UI Prototype
 
-The early interface concept for **TalentLens AI** was designed in Figma to visualize the platform flow before development.
+<div align="center">
 
-⚠️ This prototype is **non-responsive and represents a visual sketch only**.  
-It demonstrates layout, navigation flow, and dashboard structure rather than a production UI.
+Early **Figma concept** used to visualize the TalentLens AI interface and user flow.
 
-🔗 **View the interactive prototype:**  
-https://sky-sadly-16861013.figma.site
+⚠️ **Design sketch only and it is not responsive and not the final UI.**
+
+🔗 https://sky-sadly-16861013.figma.site
 
 <br>
 
@@ -32,7 +32,7 @@ https://sky-sadly-16861013.figma.site
 <img src="https://img.shields.io/badge/View_UI_Prototype-Figma-ff7262?style=for-the-badge&logo=figma">
 </a>
 
----
+</div>
 
 <div align="center">
 
