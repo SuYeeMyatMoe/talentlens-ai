@@ -2,7 +2,7 @@
 <div align="center">
 
 ### 🎥 Demo Presentation
-[![Watch the Demo](https://img.youtube.com/vi/c-3yRsB1Ug4/maxresdefault.jpg)](https://youtu.be/c-3yRsB1Ug4)
+[![Watch the Demo](https://github.com/SuYeeMyatMoe/talentlens-ai/blob/c5e750f86c7460c75893105f05f9c59575291b1f/projectUI_images/CoverPage.png)](https://youtu.be/c-3yRsB1Ug4)
 
 </div>
 
