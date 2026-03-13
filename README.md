@@ -111,7 +111,6 @@ TalentLens AI is the first platform to log hiring decisions natively to the EVM-
 - **Automated Semantic Screening** — Replaces keyword-matching ATS with context-aware Sentence-BERT embeddings
 - **Bias Risk Dashboards** — View composite fairness scores across the entire applicant pool per job
 - **Blockchain Decision Logging** — Protect against discrimination disputes with immutable on-chain proof
-- **AI Interview Questions** — Candidate-specific questions generated from their actual resume and identified gaps
 - **Multi-Candidate Comparison** — Gemini-powered side-by-side analysis with a ranked hiring recommendation
 
 ### 👤 For Candidates
@@ -202,7 +201,6 @@ mapping(uint256 => HiringRecord) private records;
 | **Frontend** | React 18, TailwindCSS, ShadCN UI | Responsive dashboards, XAI report rendering, Recharts analytics |
 | **Backend API** | FastAPI (Python 3.11) | Async endpoints, background task queue for AI processing |
 | **AI / NLP** | Sentence-BERT, spaCy, scikit-learn | NER skill extraction, cosine similarity scoring, bias detection |
-| **Generative AI** | Google Gemini 1.5 Flash / Pro | Resume parsing, job description generation, interview questions |
 | **Blockchain** | Solidity 0.8.19, Web3.py, Polygon | Immutable EVM smart contract for hiring decision records |
 | **Data Layer** | SQLAlchemy, MySQL / SQLite | Relational ORM for all application state |
 | **Auth** | JWT (python-jose), bcrypt (passlib) | Stateless role-based authentication |
