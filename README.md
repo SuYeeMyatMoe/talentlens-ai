@@ -1,4 +1,10 @@
 <h1 align="center">🔍 TalentLens AI: The Future of Fair Recruitment</h1>
+<div align="center">
+
+### 🎥 Demo Presentation
+[![Watch the Demo](https://img.youtube.com/vi/c-3yRsB1Ug4/maxresdefault.jpg)](https://youtu.be/c-3yRsB1Ug4)
+
+</div>
 
 <div align="center">
 
@@ -265,6 +271,6 @@ CHAIN_ID=80001
 
 <div align="center">
 
-Built with ❤️ for Hackathon 2024 &nbsp;|&nbsp; TalentLens AI &nbsp;|&nbsp; Fair Hiring for Everyone
+Built with ❤️ for Hackathon 2026 &nbsp;|&nbsp; TalentLens AI &nbsp;|&nbsp; Fair Hiring for Everyone
 
 </div>
