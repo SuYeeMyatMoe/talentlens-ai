@@ -87,7 +87,6 @@ Early **Figma concept** used to visualize the TalentLens AI interface and user f
 - [🤖 AI and Data Analysis](#-ai-and-data-analysis)
 - [⛓️ Blockchain Architecture](#️-blockchain-architecture)
 - [🛠️ Tech Stack](#️-tech-stack)
-- [🏗️ System and User Flow](#️-system-and-user-flow)
 - [💻 Installation and Setup](#-installation-and-setup)
 
 ---
