@@ -22,7 +22,7 @@ https://youtu.be/c-3yRsB1Ug4
 
 Early **Figma concept** used to visualize the TalentLens AI interface and user flow.
 
-⚠️ **Design sketch only and it is not responsive and not the final UI.**
+⚠️ **Design sketch only and it is not the complete final UI.**
 
 🔗 https://sky-sadly-16861013.figma.site
 
