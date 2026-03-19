@@ -49,11 +49,11 @@ export default function CandidateRanking() {
       c.candidate_email.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => {
       let va = sortBy === "final_score" ? a.ranking?.final_score ?? -1
-             : sortBy === "fairness" ? a.bias_report?.fairness_score ?? -1
-             : sortBy === "name" ? a.candidate_name : 0;
+        : sortBy === "fairness" ? a.bias_report?.fairness_score ?? -1
+          : sortBy === "name" ? a.candidate_name : 0;
       let vb = sortBy === "final_score" ? b.ranking?.final_score ?? -1
-             : sortBy === "fairness" ? b.bias_report?.fairness_score ?? -1
-             : sortBy === "name" ? b.candidate_name : 0;
+        : sortBy === "fairness" ? b.bias_report?.fairness_score ?? -1
+          : sortBy === "name" ? b.candidate_name : 0;
       if (typeof va === "string") return sortDir === "asc" ? va.localeCompare(vb) : vb.localeCompare(va);
       return sortDir === "asc" ? va - vb : vb - va;
     });
@@ -67,7 +67,13 @@ export default function CandidateRanking() {
     under_review: <span className="badge-blue"><Sparkles className="w-3 h-3" /> Reviewing</span>,
     shortlisted: <span className="badge-green"><CheckCircle2 className="w-3 h-3" /> Shortlisted</span>,
     rejected: <span className="badge-red"><XCircle className="w-3 h-3" /> Rejected</span>,
+    interview_scheduled: <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-medium"><Clock className="w-3 h-3" /> Interview</span>,
+    interview_completed: <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 text-xs font-medium"><CheckCircle2 className="w-3 h-3" /> Interviewed</span>,
+    hired: <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 text-green-800 text-xs font-medium"><CheckCircle2 className="w-3 h-3" /> Hired</span>,
   }[status] || <span className="badge-gray">{status}</span>);
+
+  const decidedStatuses = ["shortlisted", "rejected", "interview_scheduled", "interview_completed", "hired"];
+
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -96,9 +102,9 @@ export default function CandidateRanking() {
               <input className="input pl-10" placeholder="Search candidates…" value={search} onChange={(e) => setSearch(e.target.value)} />
             </div>
             <div className="flex items-center gap-3 ml-auto text-sm text-gray-500">
-              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-400" />{candidates.filter(c => c.status === "shortlisted").length} Shortlisted</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-400" />{candidates.filter(c => ["shortlisted", "interview_scheduled", "interview_completed", "hired"].includes(c.status)).length} Progressing</span>
               <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-red-400" />{candidates.filter(c => c.status === "rejected").length} Rejected</span>
-              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-gray-300" />{candidates.filter(c => !["shortlisted","rejected"].includes(c.status)).length} Pending</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-gray-300" />{candidates.filter(c => !decidedStatuses.includes(c.status)).length} Pending</span>
             </div>
           </div>
 

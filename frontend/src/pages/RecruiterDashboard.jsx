@@ -1,20 +1,96 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   BarChart3, Users, Briefcase, TrendingUp, Plus, ChevronRight,
-  Play, CheckCircle2, XCircle, Clock, Sparkles, Bell
+  Play, CheckCircle2, Clock, Sparkles, Bell,
+  AlertCircle, Info, Calendar
 } from "lucide-react";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, PieChart, Pie, Cell
 } from "recharts";
-import { jobsAPI, aiAPI } from "../api/client";
+import { jobsAPI, aiAPI, notificationsAPI } from "../api/client";
 import Sidebar from "../components/Sidebar";
 import toast from "react-hot-toast";
 
 const COLORS = ["#7c3aed", "#2563eb", "#10b981", "#f59e0b"];
 
+// ─── Notification type styling map ──────────────────────────────────────────
+const NOTIF_STYLES = {
+  success: {
+    dot: "bg-green-400",
+    badge: "bg-green-50 text-green-700 border border-green-200",
+    icon: CheckCircle2,
+    iconColor: "text-green-500",
+  },
+  info: {
+    dot: "bg-blue-400",
+    badge: "bg-blue-50 text-blue-700 border border-blue-200",
+    icon: Info,
+    iconColor: "text-blue-500",
+  },
+  warning: {
+    dot: "bg-yellow-400",
+    badge: "bg-yellow-50 text-yellow-700 border border-yellow-200",
+    icon: AlertCircle,
+    iconColor: "text-yellow-500",
+  },
+  decision: {
+    dot: "bg-primary-400",
+    badge: "bg-primary-50 text-primary-700 border border-primary-200",
+    icon: Sparkles,
+    iconColor: "text-primary-500",
+  },
+};
+
+// ─── Single recruiter notification item ─────────────────────────────────────
+function RecruiterNotifItem({ notif, onMarkRead }) {
+  const cfg = NOTIF_STYLES[notif.type] || NOTIF_STYLES.info;
+  const NotifIcon = cfg.icon;
+
+  const handleClick = () => {
+    if (!notif.read_status) onMarkRead(notif.id);
+  };
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: -6 }}
+      animate={{ opacity: 1, y: 0 }}
+      onClick={handleClick}
+      className={`px-5 py-4 flex items-start gap-3 cursor-pointer transition-colors ${!notif.read_status ? "bg-blue-50/50 hover:bg-blue-50" : "hover:bg-gray-50/60"
+        }`}
+    >
+      {/* Unread dot */}
+      <div className={`w-2 h-2 rounded-full mt-2 shrink-0 transition-all ${!notif.read_status ? cfg.dot : "bg-gray-200"
+        }`} />
+
+      {/* Icon badge */}
+      <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${cfg.badge}`}>
+        <NotifIcon className={`w-4 h-4 ${cfg.iconColor}`} />
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-start justify-between gap-2">
+          <span className={`text-sm font-semibold leading-snug ${!notif.read_status ? "text-gray-900" : "text-gray-700"
+            }`}>
+            {notif.title}
+          </span>
+          <span className="text-[10px] text-gray-400 shrink-0 mt-0.5">
+            {new Date(notif.created_at).toLocaleString([], {
+              month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+            })}
+          </span>
+        </div>
+        <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{notif.message}</p>
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── Main Component ──────────────────────────────────────────────────────────
 export default function RecruiterDashboard() {
   const location = useLocation();
   const path = location.pathname;
@@ -26,15 +102,42 @@ export default function RecruiterDashboard() {
 
   const [jobs, setJobs] = useState([]);
   const [stats, setStats] = useState(null);
+  const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(null);
 
-  useEffect(() => {
-    Promise.all([jobsAPI.list(), aiAPI.dashboardStats()]).then(([j, s]) => {
-      setJobs(j.data);
-      setStats(s.data);
-    }).catch(console.error).finally(() => setLoading(false));
+  const fetchAll = useCallback(() => {
+    Promise.all([jobsAPI.list(), aiAPI.dashboardStats(), notificationsAPI.list()])
+      .then(([j, s, n]) => {
+        setJobs(j.data);
+        setStats(s.data);
+        setNotifications(n.data);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => { fetchAll(); }, [fetchAll]);
+
+  const unread = notifications.filter(n => !n.read_status).length;
+
+  const handleMarkRead = async (id) => {
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read_status: true } : n));
+    try {
+      await notificationsAPI.markRead(id);
+    } catch {
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, read_status: false } : n));
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read_status: true })));
+    try {
+      await notificationsAPI.markAllRead();
+    } catch {
+      fetchAll();
+    }
+  };
 
   const runAnalysis = async (jobId) => {
     setAnalyzing(jobId);
@@ -65,7 +168,7 @@ export default function RecruiterDashboard() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
+      <Sidebar notifications={unread} />
       <main className="flex-1 ml-60 min-h-screen">
         {/* Header */}
         <div className="bg-white border-b border-gray-100 px-8 h-16 flex items-center justify-between">
@@ -73,9 +176,16 @@ export default function RecruiterDashboard() {
             <h1 className="page-title">Recruiter Dashboard</h1>
             <p className="text-xs text-gray-400">Overview of your hiring pipeline</p>
           </div>
-          <Link to="/recruiter/jobs/create" className="btn-primary">
-            <Plus className="w-4 h-4" /> New Job
-          </Link>
+          <div className="flex items-center gap-3">
+            {unread > 0 && !showNotifs && (
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 rounded-xl text-blue-700 text-sm font-medium">
+                <Bell className="w-4 h-4" /> {unread} new notification{unread > 1 ? "s" : ""}
+              </div>
+            )}
+            <Link to="/recruiter/jobs/create" className="btn-primary">
+              <Plus className="w-4 h-4" /> New Job
+            </Link>
+          </div>
         </div>
 
         <div className="p-8 space-y-8 animate-fade-in">
@@ -215,11 +325,56 @@ export default function RecruiterDashboard() {
             </div>
           )}
 
-          {/* Notifications Placeholder for Admin */}
+          {/* ── Notifications (recruiter) ── */}
           {showNotifs && (
-            <div className="card p-12 text-center text-gray-400">
-              <Bell className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-              <p>No new notifications</p>
+            <div className="card overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Bell className="w-4 h-4 text-primary-500" />
+                  <h2 className="section-title">Notifications</h2>
+                </div>
+                <div className="flex items-center gap-3">
+                  {unread > 0 && (
+                    <>
+                      <span className="text-xs px-2.5 py-1 rounded-full bg-primary-100 text-primary-700 font-semibold">
+                        {unread} unread
+                      </span>
+                      <button
+                        onClick={handleMarkAllRead}
+                        className="text-xs text-gray-400 hover:text-gray-600 transition-colors font-medium"
+                      >
+                        Mark all read
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className="divide-y divide-gray-100">
+                {loading ? (
+                  <div className="p-10 text-center">
+                    <div className="w-6 h-6 border-2 border-primary-400 border-t-transparent rounded-full animate-spin mx-auto" />
+                  </div>
+                ) : notifications.length === 0 ? (
+                  <div className="p-12 text-center">
+                    <Bell className="w-12 h-12 text-gray-200 mx-auto mb-3" />
+                    <p className="text-gray-400 text-sm font-medium">No notifications yet</p>
+                    <p className="text-gray-300 text-xs mt-1">
+                      You'll be notified when candidates accept or decline interviews.
+                    </p>
+                  </div>
+                ) : (
+                  <AnimatePresence>
+                    {notifications.map(n => (
+                      <RecruiterNotifItem
+                        key={n.id}
+                        notif={n}
+                        onMarkRead={handleMarkRead}
+                      />
+                    ))}
+                  </AnimatePresence>
+                )}
+              </div>
             </div>
           )}
         </div>
