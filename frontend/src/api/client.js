@@ -74,6 +74,17 @@ export const aiAPI = {
   runAnalysis: (jobId) => api.post(`/api/ai/run-analysis/${jobId}`),
   dashboardStats: () => api.get("/api/ai/dashboard-stats"),
   generateJob: (data) => api.post("/api/ai/generate-job", data),
+  resumeQuality: (appId) => api.post(`/api/ai/resume-quality/${appId}`),
+  compare: (jobId) => api.post(`/api/ai/compare/${jobId}`),
+};
+
+// ─── Interviews ────────────────────────────────────────────────────────────────
+export const interviewsAPI = {
+  suggest: (appId, data) => api.post(`/api/interviews/suggest/${appId}`, data),
+  schedule: (appId, data) => api.post(`/api/interviews/schedule/${appId}`, data),
+  get: (appId) => api.get(`/api/interviews/${appId}`),
+  complete: (appId) => api.put(`/api/interviews/${appId}/complete`),
+  respond: (appId, response) => api.put(`/api/interviews/${appId}/respond`, { response }),
 };
 
 // ─── Notifications ─────────────────────────────────────────────────────────────
