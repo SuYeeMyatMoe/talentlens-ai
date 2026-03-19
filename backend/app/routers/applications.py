@@ -224,7 +224,7 @@ async def make_decision(application_id: int, data: DecisionRequest,
     if not job or job.created_by != admin.id:
         raise HTTPException(status_code=403, detail="Not authorized. You did not create this job.")
 
-    app.status = data.decision.value
+    app.status = data.decision.value  # "shortlisted" or "rejected" — plain string
 
     # Notify candidate
     score = app.ranking.final_score if app.ranking else 0

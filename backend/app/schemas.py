@@ -14,6 +14,9 @@ class ApplicationStatus(str, Enum):
     applied = "applied"
     under_review = "under_review"
     shortlisted = "shortlisted"
+    interview_scheduled = "interview_scheduled"
+    interview_completed = "interview_completed"
+    hired = "hired"
     rejected = "rejected"
 
 
@@ -138,7 +141,7 @@ class ApplicationResponse(BaseModel):
     id: int
     user_id: int
     job_id: int
-    status: ApplicationStatus
+    status: str  # plain string — accepts all status values including new interview states
     created_at: datetime
     candidate_name: Optional[str] = None
     candidate_email: Optional[str] = None
@@ -167,7 +170,7 @@ class CandidateDetailResponse(BaseModel):
     application_id: int
     candidate_name: str
     candidate_email: str
-    status: ApplicationStatus
+    status: str  # plain string — accepts all status values
     resume: Optional[ResumeResponse] = None
     ranking: Optional[RankingResponse] = None
     bias_report: Optional[BiasReportResponse] = None
@@ -204,6 +207,7 @@ class NotificationResponse(BaseModel):
     message: Optional[str]
     type: str
     read_status: bool
+    application_id: Optional[int] = None
     created_at: datetime
 
     class Config:
@@ -220,3 +224,48 @@ class DashboardStats(BaseModel):
     avg_fairness_score: float
     score_distribution: List[Any]
     fairness_trend: List[Any]
+
+
+# ─── Interview Schemas ─────────────────────────────────────────────────────────
+class InterviewSuggestRequest(BaseModel):
+    availability_notes: Optional[str] = ""
+    mode: str = "online"  # online or onsite
+
+
+class InterviewScheduleRequest(BaseModel):
+    scheduled_date: str          # YYYY-MM-DD
+    scheduled_time: str          # HH:MM
+    duration_minutes: int = 45
+    mode: str = "online"
+    meeting_link: Optional[str] = ""
+    location: Optional[str] = ""
+    notes: Optional[str] = ""
+
+
+class InterviewResponse(BaseModel):
+    id: int
+    application_id: int
+    scheduled_date: str
+    scheduled_time: str
+    duration_minutes: int
+    mode: str
+    meeting_link: Optional[str] = None
+    location: Optional[str] = None
+    status: str
+    candidate_response: Optional[str] = "pending"
+    email_sent: bool
+    email_simulated: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# ─── Resume Quality Schema ─────────────────────────────────────────────────────
+class ResumeQualityResponse(BaseModel):
+    quality_score: int
+    grade: str
+    strengths: List[str]
+    improvements: List[str]
+    summary: str
+

@@ -196,7 +196,7 @@ def extract_education(text: str) -> str:
 
 
 async def parse_resume(filepath: str, content_type: str) -> Dict[str, Any]:
-    """Main parse function — returns structured JSON without name/email."""
+    """Main parse function — uses Gemini Flash for extraction, falls back to rule-based."""
     if "pdf" in content_type:
         raw_text = extract_text_from_pdf(filepath)
     else:
@@ -209,20 +209,27 @@ async def parse_resume(filepath: str, content_type: str) -> Dict[str, Any]:
         }
 
     cleaned = clean_text(raw_text)
-    sections = detect_sections(cleaned)
 
-    # Extract from specific sections + full text fallback
+    # Try Gemini Flash parsing first (more accurate)
+    try:
+        from app.ai_modules.gemini_resume_parser import parse_resume_with_gemini
+        gemini_result = parse_resume_with_gemini(cleaned)
+        if gemini_result and gemini_result.get("skills"):
+            # Merge: use Gemini's structured data, keep cleaned raw_text
+            gemini_result["raw_text"] = cleaned[:5000]
+            return gemini_result
+    except Exception as e:
+        print(f"[ResumeParser] Gemini Flash unavailable, using rule-based: {e}")
+
+    # Rule-based fallback
+    sections = detect_sections(cleaned)
     skills_text = sections["skills"] + " " + cleaned
     skills = extract_skills(skills_text)
-
     experience_years = extract_experience_years(sections["experience"] + " " + cleaned)
-    
     projects_text = sections["projects"]
     if not projects_text.strip():
-        # Fallback to experience + raw if not found explicitly
         projects_text = sections["experience"] + " " + cleaned
     projects = extract_projects(projects_text)
-    
     education = extract_education(sections["education"] + " " + cleaned)
 
     return {
@@ -230,5 +237,6 @@ async def parse_resume(filepath: str, content_type: str) -> Dict[str, Any]:
         "experience_years": experience_years,
         "projects": projects,
         "education": education,
-        "raw_text": cleaned[:5000],  # Limit stored raw text
+        "raw_text": cleaned[:5000],
     }
+

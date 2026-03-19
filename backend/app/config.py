@@ -17,6 +17,16 @@ class Settings(BaseSettings):
     APP_ENV: str = "development"
     FRONTEND_URL: str = "http://localhost:5173"
 
+    # Gemini AI
+    GEMINI_API_KEY: str = "AIzaSyBjfB5VA02czf8V88UMZvPHObqhZtkbWFU"
+
+    # SMTP (optional — simulated if not set)
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASS: str = ""
+    SMTP_FROM: str = "noreply@talentlens.ai"
+
     class Config:
         env_file = ".env"
 

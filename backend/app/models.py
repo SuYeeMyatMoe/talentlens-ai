@@ -17,6 +17,9 @@ class ApplicationStatus(str, enum.Enum):
     applied = "applied"
     under_review = "under_review"
     shortlisted = "shortlisted"
+    interview_scheduled = "interview_scheduled"
+    interview_completed = "interview_completed"
+    hired = "hired"
     rejected = "rejected"
 
 
@@ -63,7 +66,8 @@ class Application(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     job_id = Column(Integer, ForeignKey("jobs.id"), nullable=False)
-    status = Column(Enum(ApplicationStatus), default=ApplicationStatus.applied)
+    # Using String instead of Enum so MySQL doesn't require ALTER TABLE for new statuses
+    status = Column(String(50), default="applied")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -75,6 +79,7 @@ class Application(Base):
     ranking = relationship("Ranking", back_populates="application", uselist=False)
     bias_report = relationship("BiasReport", back_populates="application", uselist=False)
     blockchain_log = relationship("BlockchainLog", back_populates="application", uselist=False)
+    interview = relationship("Interview", back_populates="application", uselist=False)
 
 
 class Resume(Base):
@@ -161,6 +166,30 @@ class Notification(Base):
     message = Column(Text)
     type = Column(Enum(NotificationType), default=NotificationType.info)
     read_status = Column(Boolean, default=False)
+    # Optional: link to an application so candidate can respond
+    application_id = Column(Integer, ForeignKey("applications.id"), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user = relationship("User", back_populates="notifications")
+
+
+class Interview(Base):
+    __tablename__ = "interviews"
+    id = Column(Integer, primary_key=True, index=True)
+    application_id = Column(Integer, ForeignKey("applications.id"), unique=True, nullable=False)
+    scheduled_date = Column(String(20), nullable=False)   # YYYY-MM-DD
+    scheduled_time = Column(String(10), nullable=False)   # HH:MM
+    duration_minutes = Column(Integer, default=45)
+    mode = Column(String(20), default="online")           # online / onsite
+    meeting_link = Column(String(500))
+    location = Column(String(255))
+    status = Column(String(50), default="scheduled")      # scheduled / completed / cancelled
+    candidate_response = Column(String(20), default="pending")  # pending / accepted / declined
+    ai_suggested_slot = Column(JSON)                      # raw AI suggestion
+    email_sent = Column(Boolean, default=False)
+    email_simulated = Column(Boolean, default=False)
+    notes = Column(Text)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    application = relationship("Application", back_populates="interview")
