@@ -300,22 +300,6 @@ CHAIN_ID=80001
 
 ---
 
-## 🆕 Changelog
-
-### v2 — Hackathon Final Build
-
-| Change | Details |
-| :--- | :--- |
-| 🔐 **Session Fix** | Landing page (`/`) now redirects authenticated users directly to their dashboard |
-| 🔍 **Job Search** | Candidates can search positions by title in the Open Positions section |
-| 🗂️ **Job Filters** | Filter open positions by All / Not Applied / Closing Soon |
-| 📊 **Status Tabs** | Recruiters filter the candidate ranking table by Shortlisted / Pending / Rejected |
-| 📥 **CSV Export** | One-click export of shortlisted candidates (name, email, status, scores, skills, blockchain) |
-| 📭 **SMTP Removed** | Email delivery removed — all notifications are in-app only |
-| 📋 **Slides & Speech** | `SLIDES.md` and `SPEECH.md` added for hackathon presentation |
-
----
-
 <div align="center">
 
 Built with ❤️ for Hackathon 2026 &nbsp;|&nbsp; TalentLens AI &nbsp;|&nbsp; Fair Hiring for Everyone
