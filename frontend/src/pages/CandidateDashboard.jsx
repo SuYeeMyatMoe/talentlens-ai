@@ -5,7 +5,7 @@ import {
   Briefcase, Clock, CheckCircle2, XCircle, Upload,
   Bell, ChevronRight, Sparkles, FileText, Calendar,
   Video, MapPin, Link2, ChevronDown, ChevronUp, Check, X,
-  Loader2, ExternalLink, AlertCircle, Info
+  Loader2, ExternalLink, AlertCircle, Info, Search, Filter
 } from "lucide-react";
 import { jobsAPI, applicationsAPI, notificationsAPI, interviewsAPI } from "../api/client";
 import { useAuth } from "../contexts/AuthContext";
@@ -266,6 +266,8 @@ export default function CandidateDashboard() {
   const [myApps, setMyApps] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [jobSearch, setJobSearch] = useState("");
+  const [jobFilter, setJobFilter] = useState("all"); // all | open | deadline_soon
 
   const fetchAll = useCallback(() => {
     Promise.all([jobsAPI.list(), applicationsAPI.myApplications(), notificationsAPI.list()])
@@ -411,46 +413,91 @@ export default function CandidateDashboard() {
           {/* Browse Jobs */}
           {(showOverview || showJobsTab) && (
             <div className="card overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-100">
+              <div className="px-6 py-4 border-b border-gray-100 space-y-3">
                 <h2 className="section-title">Open Positions</h2>
+                {/* Search + Filter bar */}
+                <div className="flex items-center gap-3">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      id="job-search"
+                      className="input pl-9 py-2 text-sm w-full"
+                      placeholder="Search positions…"
+                      value={jobSearch}
+                      onChange={e => setJobSearch(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Filter className="w-4 h-4 text-gray-400" />
+                    {[{ value: "all", label: "All" }, { value: "not_applied", label: "Not Applied" }, { value: "deadline_soon", label: "Closing Soon" }].map(opt => (
+                      <button
+                        key={opt.value}
+                        id={`filter-${opt.value}`}
+                        onClick={() => setJobFilter(opt.value)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${jobFilter === opt.value
+                            ? "bg-primary-600 text-white"
+                            : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                          }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
               <div className="divide-y divide-gray-50">
                 {loading ? (
                   <div className="p-8 text-center text-gray-400">Loading jobs…</div>
-                ) : jobs.filter(j => j.published).length === 0 ? (
-                  <div className="p-8 text-center">
-                    <Briefcase className="w-12 h-12 text-gray-200 mx-auto mb-2" />
-                    <p className="text-gray-400">No open positions yet</p>
-                  </div>
-                ) : jobs.filter(j => j.published).map((job) => (
-                  <div key={job.id} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
-                    <div>
-                      <h3 className="font-medium text-gray-900 text-sm">{job.title}</h3>
-                      <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
-                        {job.deadline && <span><Clock className="w-3 h-3 inline mr-1" />Due {new Date(job.deadline).toLocaleDateString()}</span>}
-                        <span>{job.application_count} applicants</span>
+                ) : (() => {
+                  const now = new Date();
+                  const sevenDays = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+                  const visibleJobs = jobs
+                    .filter(j => j.published)
+                    .filter(j => {
+                      if (jobSearch) return j.title.toLowerCase().includes(jobSearch.toLowerCase());
+                      return true;
+                    })
+                    .filter(j => {
+                      if (jobFilter === "not_applied") return !applied.includes(j.id);
+                      if (jobFilter === "deadline_soon") return j.deadline && new Date(j.deadline) <= sevenDays && new Date(j.deadline) >= now;
+                      return true;
+                    });
+                  if (visibleJobs.length === 0) return (
+                    <div className="p-8 text-center">
+                      <Briefcase className="w-12 h-12 text-gray-200 mx-auto mb-2" />
+                      <p className="text-gray-400">{jobSearch ? `No positions matching "${jobSearch}"` : "No open positions match your filter"}</p>
+                    </div>
+                  );
+                  return visibleJobs.map((job) => (
+                    <div key={job.id} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                      <div>
+                        <h3 className="font-medium text-gray-900 text-sm">{job.title}</h3>
+                        <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
+                          {job.deadline && <span><Clock className="w-3 h-3 inline mr-1" />Due {new Date(job.deadline).toLocaleDateString()}</span>}
+                          <span>{job.application_count} applicants</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {applied.includes(job.id) ? (() => {
+                          const app = myApps.find(a => a.job_id === job.id);
+                          const cfg = statusConfig[app?.status] || statusConfig.applied;
+                          return (
+                            <span className={`px-2.5 py-1 text-xs font-medium rounded-lg ${cfg.bg} ${cfg.color}`}>
+                              {cfg.label}
+                            </span>
+                          );
+                        })() : (
+                          <Link to={`/candidate/job/${job.id}`} className="btn-primary py-1.5 px-4 text-xs">
+                            Apply Now
+                          </Link>
+                        )}
+                        <Link to={`/candidate/job/${job.id}`} className="btn-outline py-1.5 px-3 text-xs">
+                          Details
+                        </Link>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {applied.includes(job.id) ? (() => {
-                        const app = myApps.find(a => a.job_id === job.id);
-                        const cfg = statusConfig[app?.status] || statusConfig.applied;
-                        return (
-                          <span className={`px-2.5 py-1 text-xs font-medium rounded-lg ${cfg.bg} ${cfg.color}`}>
-                            {cfg.label}
-                          </span>
-                        );
-                      })() : (
-                        <Link to={`/candidate/job/${job.id}`} className="btn-primary py-1.5 px-4 text-xs">
-                          Apply Now
-                        </Link>
-                      )}
-                      <Link to={`/candidate/job/${job.id}`} className="btn-outline py-1.5 px-3 text-xs">
-                        Details
-                      </Link>
-                    </div>
-                  </div>
-                ))}
+                  ));
+                })()}
               </div>
             </div>
           )}

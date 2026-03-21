@@ -24,7 +24,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={user ? <Navigate to={user.role === "admin" ? "/recruiter" : "/candidate"} replace /> : <Login />} />
-      <Route path="/register" element={user ? <Navigate to="/candidate" replace /> : <Register />} />
+      <Route path="/register" element={<Register />} />
 
       <Route path="/candidate" element={<ProtectedRoute role="candidate"><CandidateDashboard /></ProtectedRoute>} />
       <Route path="/candidate/jobs" element={<ProtectedRoute role="candidate"><CandidateDashboard /></ProtectedRoute>} />

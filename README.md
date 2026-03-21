@@ -11,7 +11,6 @@ https://youtu.be/c-3yRsB1Ug4
 <a href="https://youtu.be/c-3yRsB1Ug4">
 <img src="https://img.shields.io/badge/▶_Watch_Full_Demo-YouTube-red?style=for-the-badge&logo=youtube">
 </a>
-
 </div>
 
 ---
@@ -130,6 +129,8 @@ TalentLens AI is the first platform to log hiring decisions natively to the EVM-
 - **Bias Risk Dashboards** — View composite fairness scores across the entire applicant pool per job
 - **Blockchain Decision Logging** — Protect against discrimination disputes with immutable on-chain proof
 - **Multi-Candidate Comparison** — Gemini-powered side-by-side analysis with a ranked hiring recommendation
+- **Status Filter Tabs** — Filter candidates by Shortlisted / Pending / Rejected in the ranking view
+- **CSV Export** — Download shortlisted candidates with AI scores, fairness scores, skills, and blockchain status
 
 ### 👤 For Candidates
 
@@ -137,6 +138,8 @@ TalentLens AI is the first platform to log hiring decisions natively to the EVM-
 - **Dynamic Status Badges** — Real application status: Under Review, Shortlisted, or Not Selected
 - **Cryptographic Verification** — Verified badge with a public Polygonscan explorer link on every decided application
 - **Resume Quality Score** — AI feedback on clarity, quantified impact, project depth, and ATS compatibility
+- **Job Search + Filter** — Search open positions by title and filter by All / Not Applied / Closing Soon
+- **Smart Session Handling** — Logged-in users are instantly redirected to their dashboard (no stale landing page)
 
 ---
 
@@ -223,6 +226,7 @@ mapping(uint256 => HiringRecord) private records;
 | **Data Layer** | SQLAlchemy, MySQL / SQLite | Relational ORM for all application state |
 | **Auth** | JWT (python-jose), bcrypt (passlib) | Stateless role-based authentication |
 | **Dev Tools** | Hardhat, Vite, Pydantic v2 | Contract deployment, frontend build, request validation |
+| **Notifications** | In-app only (no SMTP dependency) | Real-time in-platform alerts for candidates and recruiters |
 ---
 
 ## 💻 Installation and Setup
@@ -290,7 +294,25 @@ WEB3_PROVIDER_URL=https://rpc-mumbai.maticvigil.com
 PRIVATE_KEY=your-wallet-private-key
 CONTRACT_ADDRESS=0xYourDeployedContract
 CHAIN_ID=80001
+
+# Note: SMTP email is NOT required — all notifications are handled in-app.
 ```
+
+---
+
+## 🆕 Changelog
+
+### v2 — Hackathon Final Build
+
+| Change | Details |
+| :--- | :--- |
+| 🔐 **Session Fix** | Landing page (`/`) now redirects authenticated users directly to their dashboard |
+| 🔍 **Job Search** | Candidates can search positions by title in the Open Positions section |
+| 🗂️ **Job Filters** | Filter open positions by All / Not Applied / Closing Soon |
+| 📊 **Status Tabs** | Recruiters filter the candidate ranking table by Shortlisted / Pending / Rejected |
+| 📥 **CSV Export** | One-click export of shortlisted candidates (name, email, status, scores, skills, blockchain) |
+| 📭 **SMTP Removed** | Email delivery removed — all notifications are in-app only |
+| 📋 **Slides & Speech** | `SLIDES.md` and `SPEECH.md` added for hackathon presentation |
 
 ---
 
