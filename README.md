@@ -1,3 +1,4 @@
+
 <h1 align="center">🔍 TalentLens AI: The Future of Fair Recruitment</h1>
 <div align="center">
 
@@ -37,12 +38,12 @@ Early **Figma concept** used to visualize the TalentLens AI interface and user f
 
 ![Status](https://img.shields.io/badge/Status-Hackathon_Ready-7c3aed?style=for-the-badge&logo=github)
 ![Blockchain](https://img.shields.io/badge/Network-Polygon_Mumbai-8247e5?style=for-the-badge&logo=polygon)
-![AI](https://img.shields.io/badge/AI-Sentence--BERT_%7C_spaCy-2563eb?style=for-the-badge&logo=google)
+![AI](https://img.shields.io/badge/AI-Gemini_%7C_spaCy-2563eb?style=for-the-badge&logo=google)
 ![Stack](https://img.shields.io/badge/Stack-React_%7C_FastAPI_%7C_MySQL-dc2626?style=for-the-badge)
 
-### Eliminating unconscious bias through identity-free AI and immutable blockchain audit trails.
+### Eliminating unconscious bias through identity-free AI, explainable hiring intelligence, and immutable blockchain audit trails.
 
-*Resume Parsing · Bias Detection · Blockchain Verification · Explainable AI*
+*Resume Parsing · Bias Detection · Explainable AI · Blockchain Verification · Interview Workflow Automation*
 
 </div>
 
@@ -60,14 +61,14 @@ Early **Figma concept** used to visualize the TalentLens AI interface and user f
 ### 📊 Recruiter Dashboard and Analytics
 <img src="./projectUI_images/RecruiterDashboard.png" width="850" alt="Recruiter Dashboard"/>
 
-*At-a-glance hiring funnels, score distributions, and one-click AI analysis.*
+*At-a-glance hiring funnels, score distributions, smart filtering, and one-click AI analysis.*
 
 ---
 
 ### 🧠 Explainable AI Analysis
 <img src="./projectUI_images/Resume_AiAnalysis.png" width="850" alt="AI Ranking Logic"/>
 
-*Identity-free semantic scoring with transparent, human-readable feedback.*
+*Gemini-powered candidate understanding with transparent, human-readable recruiter and candidate feedback.*
 
 ---
 
@@ -85,6 +86,7 @@ Early **Figma concept** used to visualize the TalentLens AI interface and user f
 - [✨ Key Features](#-key-features)
 - [🤖 AI and Data Analysis](#-ai-and-data-analysis)
 - [⛓️ Blockchain Architecture](#️-blockchain-architecture)
+- [🔄 System Workflow](#-system-workflow)
 - [🛠️ Tech Stack](#️-tech-stack)
 - [💻 Installation and Setup](#-installation-and-setup)
 
@@ -94,29 +96,35 @@ Early **Figma concept** used to visualize the TalentLens AI interface and user f
 
 **The Broken State of Recruitment**
 
-The global recruitment industry processes 750 million+ applications annually, yet relies on flawed, manual, or poorly automated systems.
+The global recruitment industry processes 750 million+ applications annually, yet still relies on flawed, manual, or poorly automated workflows.
 
 | Problem | Statistic |
 | :--- | :--- |
-| **Unconscious Bias** | 47% of qualified candidates rejected due to non-merit factors — name, age, school prestige |
-| **Zero Transparency** | 78% of candidates never receive meaningful feedback, violating GDPR Article 22 |
+| **Unconscious Bias** | 47% of qualified candidates rejected due to non-merit factors such as name, age, or school prestige |
+| **Zero Transparency** | 78% of candidates never receive meaningful feedback during the hiring process |
 | **No Audit Trail** | 1 in 4 companies report disputed hiring records due to mutable, centralised databases |
-| **Slow Screening** | Manual review of 100 resumes takes 40–60 hours per recruiter |
+| **Slow Screening** | Manual review of 100 resumes can consume 40–60 hours per recruiter |
 
 ---
 
 ## 💡 Innovation and Enterprise Solution
 
-**TalentLens AI** is an end-to-end, enterprise-ready recruitment ecosystem. We do not just automate hiring — we fundamentally re-engineer it for fairness and transparency.
+**TalentLens AI** is an end-to-end, enterprise-ready recruitment ecosystem. We do not just automate hiring — we redesign it for fairness, transparency, and workflow efficiency.
 
-**Identity-Free Architecture**
-Candidate PII (name, email, phone) is separated from the resume before it reaches the AI model. The ranking engine only sees skills, experience, projects, and education — never who the person is.
+**Identity-Free Architecture**  
+Candidate PII such as name, email, and phone number is separated before AI analysis begins. The model evaluates only skills, experience, projects, and education, helping recruiters focus on merit instead of identity.
 
-**Mathematical Fairness**
-Bias is not a warning label. It is a mathematical constraint. Our `FairnessFactor` automatically adjusts the final score if bias markers are detected, moving unfairly profiled candidates down the ranking automatically.
+**Gemini-Powered Intelligence**  
+TalentLens AI uses Gemini-powered analysis together with NLP processing to understand resumes more deeply, extract meaningful candidate insights, compare relevance against job requirements, and generate explainable reports for both recruiters and candidates.
 
-**Zero-Trust Auditing**
-TalentLens AI is the first platform to log hiring decisions natively to the EVM-compatible Polygon Blockchain, creating a permanent, tamper-proof record that cannot be deleted — even by the platform owner.
+**Mathematical Fairness**  
+Bias is not treated as a warning label alone. Our fairness layer evaluates experience bias, education bias, and career gap bias, then adjusts the final score to reduce unfair ranking outcomes.
+
+**Workflow Automation**  
+Beyond screening, the platform streamlines the recruitment pipeline with shortlist filtering, status-based candidate management, CSV export for HR reporting, and interview workflow support from shortlisting to interview-stage updates.
+
+**Zero-Trust Auditing**  
+TalentLens AI records hiring decisions on the EVM-compatible Polygon Blockchain, creating a tamper-proof audit trail that improves accountability, transparency, and trust.
 
 ---
 
@@ -125,62 +133,94 @@ TalentLens AI is the first platform to log hiring decisions natively to the EVM-
 ### 🏢 For Enterprise Recruiters
 
 - **One-Click AI Job Generation** — Auto-generate job descriptions and skill requirements from a single role title
-- **Automated Semantic Screening** — Replaces keyword-matching ATS with context-aware Sentence-BERT embeddings
-- **Bias Risk Dashboards** — View composite fairness scores across the entire applicant pool per job
-- **Blockchain Decision Logging** — Protect against discrimination disputes with immutable on-chain proof
-- **Multi-Candidate Comparison** — Gemini-powered side-by-side analysis with a ranked hiring recommendation
-- **Status Filter Tabs** — Filter candidates by Shortlisted / Pending / Rejected in the ranking view
-- **CSV Export** — Download shortlisted candidates with AI scores, fairness scores, skills, and blockchain status
+- **Gemini-Powered Candidate Analysis** — Generate deeper candidate insights, comparisons, and hiring recommendations using Gemini AI
+- **Automated Semantic Screening** — Move beyond basic keyword matching with context-aware resume understanding
+- **Bias Risk Dashboards** — View composite fairness scores across the applicant pool for each job
+- **Blockchain Decision Logging** — Protect against disputes with immutable on-chain hiring records
+- **Multi-Candidate Comparison** — Compare applicants side by side with AI-assisted evaluation support
+- **Advanced Status Filters** — Filter candidates by Pending, Shortlisted, Rejected, interview stage, or ranking category in the recruiter dashboard
+- **CSV Export** — Download shortlisted or filtered candidates with scores, fairness data, skills, and blockchain status
+- **Interview Workflow Management** — Support shortlist-to-interview progression with interview scheduling and stage tracking
 
 ### 👤 For Candidates
 
-- **Explainable AI Reports** — Every candidate sees exactly why they scored what they scored: Strengths, Concerns, Recommendations
-- **Dynamic Status Badges** — Real application status: Under Review, Shortlisted, or Not Selected
-- **Cryptographic Verification** — Verified badge with a public Polygonscan explorer link on every decided application
-- **Resume Quality Score** — AI feedback on clarity, quantified impact, project depth, and ATS compatibility
-- **Job Search + Filter** — Search open positions by title and filter by All / Not Applied / Closing Soon
-- **Smart Session Handling** — Logged-in users are instantly redirected to their dashboard (no stale landing page)
+- **Explainable AI Reports** — Every candidate can see why they received a score through strengths, concerns, and improvement suggestions
+- **Gemini-Generated Insights** — AI-generated feedback helps candidates understand role fit, resume quality, and missing strengths
+- **Dynamic Status Badges** — Real application status such as Under Review, Shortlisted, Interview Stage, or Not Selected
+- **Cryptographic Verification** — Verified badge with a public Polygonscan link on every blockchain-recorded decision
+- **Resume Quality Score** — AI feedback on clarity, measurable impact, project depth, and ATS readiness
+- **Job Search + Filter** — Search open positions by title and filter by All, Not Applied, or Closing Soon
+- **Smart Session Handling** — Logged-in users are redirected directly to the correct dashboard for a smoother experience
 
 ---
 
 ## 🤖 AI and Data Analysis
 
-Our AI engine uses a 3-layer pipeline that goes far beyond traditional string matching.
+Our AI engine uses a multi-layer analysis pipeline that goes beyond traditional keyword matching.
 
-### Layer 1 — Semantic Embeddings (Sentence-BERT)
+### Layer 1 — Gemini-Powered Resume Understanding
 
-Uses `all-MiniLM-L6-v2` to compute 384-dimensional vector embeddings. Cosine similarity between vectors finds skill matches by meaning, not string equality.
+Gemini analyzes resume content semantically to understand skills, experience, projects, role relevance, and profile strengths in context rather than relying only on exact word matches.
 
-```
-"ML"     ≈  "Machine Learning"  ≈  "Supervised Learning"  →  0.94 similarity ✅
-"React"  ≈  "React.js"                                    →  0.97 similarity ✅
-"FastAPI" ≈  "Python backend"                             →  0.71 similarity ✅
-```
+```text
+"ML"                ≈ "Machine Learning"
+"React"             ≈ "React.js"
+"FastAPI"           ≈ "Python backend API development"
+"Data Analysis"     ≈ "Analytics and reporting"
+````
 
-### Layer 2 — Non-Linear Weighted Scoring
+This allows TalentLens AI to identify meaningful matches even when candidates use different phrasing from the job description.
 
-| Factor | Weight | Method |
-| :--- | :---: | :--- |
-| Skill Match | 40% | BERT cosine similarity against job requirements |
-| Experience Depth | 25% | Non-linear curve, capped at 10 yrs to prevent seniority bias |
-| Project Impact | 20% | Quantity + quality bonus for ML, production, distributed work |
-| Skill Diversity | 10% | Coverage across 6 tech categories |
-| Soft Skills | 5% | 8 keyword markers — Leadership, Agile, Scrum, Communication |
+### Layer 2 — Structured NLP Extraction
 
-### Layer 3 — The 3-Layer Bias Detector
+Using NLP processing with spaCy and backend parsing logic, the system extracts structured candidate signals such as:
 
-| Detector | What It Catches |
-| :--- | :--- |
-| **Experience Bias** | Penalising entry-level candidates, career changers, or returners unfairly |
-| **Education Bias** | Over-weighting elite schools or under-valuing bootcamp / self-taught paths |
-| **Career Gap Bias** | Penalising gaps from parental leave, illness, caregiving, or relocation |
+* technical skills
+* tools and frameworks
+* project keywords
+* education details
+* experience indicators
+* soft skill signals
+
+These extracted features are passed into the scoring and fairness pipeline.
+
+### Layer 3 — Non-Linear Weighted Scoring
+
+| Factor           | Weight | Method                                                                           |
+| :--------------- | :----: | :------------------------------------------------------------------------------- |
+| Skill Match      |   40%  | Gemini-assisted semantic relevance against job requirements                      |
+| Experience Depth |   25%  | Non-linear curve capped to reduce seniority bias                                 |
+| Project Impact   |   20%  | Quality and relevance of practical work, production systems, and technical depth |
+| Skill Diversity  |   10%  | Coverage across multiple technical categories                                    |
+| Soft Skills      |   5%   | Communication, teamwork, leadership, and collaboration indicators                |
+
+### Layer 4 — Bias Detection and Fairness Adjustment
+
+| Detector            | What It Catches                                                                |
+| :------------------ | :----------------------------------------------------------------------------- |
+| **Experience Bias** | Unfair penalisation of entry-level candidates, returners, or career changers   |
+| **Education Bias**  | Over-valuing elite institutions while under-valuing alternative learning paths |
+| **Career Gap Bias** | Unfair treatment of gaps caused by caregiving, health recovery, or relocation  |
 
 > **The Fairness Formula**
-> ```
+>
+> ```text
 > FairnessScore = 100 - (exp_bias × 0.40 + edu_bias × 0.35 + gap_bias × 0.25)
 > FinalScore    = RawScore × (FairnessScore / 100)
 > ```
-> Bias does not just get flagged — it mathematically reduces the final score and repositions the candidate in the ranking.
+>
+> Bias is not only detected — it actively influences ranking fairness through score adjustment.
+
+### Layer 5 — Explainable AI Output
+
+The final stage produces recruiter-facing and candidate-facing explanations, including:
+
+* score breakdown
+* strengths
+* concerns
+* improvement suggestions
+* Gemini-generated candidate insights
+* recommendation rationale for ranking and shortlisting
 
 ---
 
@@ -188,7 +228,7 @@ Uses `all-MiniLM-L6-v2` to compute 384-dimensional vector embeddings. Cosine sim
 
 **Trustless Data Integrity on Polygon Mumbai**
 
-Polygon was chosen over Ethereum mainnet because it is fully EVM-compatible (same Solidity, zero code changes) while costing ~$0.00002 per transaction versus $5–$30 on Ethereum — making per-decision logging viable at enterprise scale.
+Polygon was chosen over Ethereum mainnet because it is fully EVM-compatible while keeping transaction costs extremely low, making per-decision logging practical for real recruitment workflows.
 
 **The Contract — `TalentLensHiring.sol`**
 
@@ -209,33 +249,51 @@ mapping(uint256 => HiringRecord) private records;
 
 1. Recruiter clicks **Log to Blockchain**
 2. Backend computes `SHA-256(resume JSON)` and produces `resumeHash`
-3. `logHiringDecision()` writes the record to Polygon — permanently and immutably
-4. Transaction hash is returned and displayed as a **Verified badge** on the candidate's profile
+3. `logHiringDecision()` writes the record to Polygon permanently and immutably
+4. Transaction hash is returned and displayed as a **Verified badge** on the candidate profile
 5. Anyone can call `verifyRecord(appId, hash)` to confirm the decision was not altered
+
+---
+
+## 🔄 System Workflow
+
+1. Candidate registers and uploads resume
+2. Recruiter creates or generates a job posting
+3. Gemini analyzes resumes and extracts candidate insights
+4. Candidates are ranked automatically using relevance and fairness scoring
+5. Recruiters review explainable AI insights and compare applicants
+6. Recruiters filter candidates by status, shortlist, or ranking score
+7. Shortlisted candidates can be exported as CSV for HR reporting
+8. Interview scheduling or interview-stage updates are managed in the workflow
+9. Final decisions are logged to the Polygon blockchain
+10. Candidates receive transparent feedback and status updates
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology | Role |
-| :--- | :--- | :--- |
-| **Frontend** | React 18, TailwindCSS, ShadCN UI | Responsive dashboards, XAI report rendering, Recharts analytics |
-| **Backend API** | FastAPI (Python 3.11) | Async endpoints, background task queue for AI processing |
-| **AI / NLP** | Sentence-BERT, spaCy, scikit-learn | NER skill extraction, cosine similarity scoring, bias detection |
-| **Blockchain** | Solidity 0.8.19, Web3.py, Polygon | Immutable EVM smart contract for hiring decision records |
-| **Data Layer** | SQLAlchemy, MySQL / SQLite | Relational ORM for all application state |
-| **Auth** | JWT (python-jose), bcrypt (passlib) | Stateless role-based authentication |
-| **Dev Tools** | Hardhat, Vite, Pydantic v2 | Contract deployment, frontend build, request validation |
-| **Notifications** | In-app only (no SMTP dependency) | Real-time in-platform alerts for candidates and recruiters |
+| Layer                  | Technology                          | Role                                                                                          |
+| :--------------------- | :---------------------------------- | :-------------------------------------------------------------------------------------------- |
+| **Frontend**           | React 18, TailwindCSS, ShadCN UI    | Responsive dashboards, XAI report rendering, analytics, and workflow UI                       |
+| **Backend API**        | FastAPI (Python 3.11)               | Async endpoints, resume analysis, candidate workflow handling, and interview stage management |
+| **AI / NLP**           | Gemini API, spaCy, scikit-learn     | Resume understanding, structured NLP extraction, candidate analysis, and bias detection       |
+| **Blockchain**         | Solidity 0.8.19, Web3.py, Polygon   | Immutable EVM smart contract for hiring decision records                                      |
+| **Data Layer**         | SQLAlchemy, MySQL / SQLite          | Relational ORM for application data and workflow state                                        |
+| **Auth**               | JWT (python-jose), bcrypt (passlib) | Stateless role-based authentication                                                           |
+| **Dev Tools**          | Hardhat, Vite, Pydantic v2          | Contract deployment, frontend build, and request validation                                   |
+| **Export / Reporting** | CSV generation                      | Shortlist export and recruiter reporting                                                      |
+| **Workflow Module**    | Interview scheduling logic          | Shortlist-to-interview pipeline tracking and status updates                                   |
+| **Notifications**      | In-app only (no SMTP dependency)    | Real-time in-platform alerts for candidates and recruiters                                    |
+
 ---
 
 ## 💻 Installation and Setup
 
 ### Prerequisites
 
-- Python 3.11+
-- Node.js 18+
-- Git
+* Python 3.11+
+* Node.js 18+
+* Git
 
 ### 1 — Backend (FastAPI)
 
@@ -278,7 +336,7 @@ npx hardhat run deploy.js --network mumbai
 # Free test MATIC: https://faucet.polygon.technology
 ```
 
-> If `CONTRACT_ADDRESS` and `PRIVATE_KEY` are not configured, the system runs in **demo mode** automatically. A deterministic mock transaction hash is generated — the candidate experience is visually identical, the hash just does not live on a real chain. No wallet or testnet required for the demo.
+> If `CONTRACT_ADDRESS` and `PRIVATE_KEY` are not configured, the system runs in **demo mode** automatically. A deterministic mock transaction hash is generated so the user experience remains visually consistent without requiring a real wallet or testnet deployment.
 
 ### Environment Variables
 
@@ -295,13 +353,13 @@ PRIVATE_KEY=your-wallet-private-key
 CONTRACT_ADDRESS=0xYourDeployedContract
 CHAIN_ID=80001
 
-# Note: SMTP email is NOT required — all notifications are handled in-app.
-```
-
+# Optional workflow/export configuration
+CSV_EXPORT_ENABLED=true
+INTERVIEW_WORKFLOW_ENABLED=true
 ---
-
+```
 <div align="center">
 
-Built with ❤️ for Hackathon 2026 &nbsp;|&nbsp; TalentLens AI &nbsp;|&nbsp; Fair Hiring for Everyone
-
+Built with ❤️ for Hackathon 2026  |  TalentLens AI  |  Fair Hiring for Everyone
 </div>
+
