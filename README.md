@@ -1,10 +1,6 @@
 <h1 align="center">🔍 TalentLens AI: The Future of Fair Recruitment</h1>
 <div align="center">
 
-
-
-<div align="center">
-
 ![Status](https://img.shields.io/badge/Status-Hackathon_Ready-7c3aed?style=for-the-badge&logo=github)
 ![Blockchain](https://img.shields.io/badge/Network-Polygon_Mumbai-8247e5?style=for-the-badge&logo=polygon)
 ![AI](https://img.shields.io/badge/AI-Gemini_%7C_spaCy-2563eb?style=for-the-badge&logo=google)
