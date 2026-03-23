@@ -329,7 +329,7 @@ Built with ❤️ for Hackathon 2026  |  TalentLens AI  |  Fair Hiring for E
 </div>
 
 <div align="center">
-### 🎥 Live Demo Presentation
+🎥 Live Demo Presentation
 
 ▶ **Watch the full platform demo here:**  
 https://youtu.be/c-3yRsB1Ug4
