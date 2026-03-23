@@ -327,6 +327,8 @@ INTERVIEW_WORKFLOW_ENABLED=true
 
 Built with ❤️ for Hackathon 2026  |  TalentLens AI  |  Fair Hiring for Everyone
 </div>
+
+<div align="center">
 ### 🎥 Live Demo Presentation
 
 ▶ **Watch the full platform demo here:**  
