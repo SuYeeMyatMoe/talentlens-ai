@@ -1,0 +1,39 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_19-71aa4ce117a94f53f26222052776c1d8c9ab1bae",
+  "solcVersion": "0.8.19",
+  "solcLongVersion": "0.8.19+commit.7dd6d404",
+  "userSourceNameMap": {
+    "contracts/TalentLensHiring.sol": "project/contracts/TalentLensHiring.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "paris",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/TalentLensHiring.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.19;\n\n/**\n * TalentLens AI - Hiring Record Contract\n * Deployed on Polygon Mumbai Testnet\n * Stores immutable hiring decisions with fairness scores\n */\ncontract TalentLensHiring {\n    address public owner;\n\n    struct HiringRecord {\n        bytes32 resumeHash;\n        uint256 score;\n        uint256 fairnessScore;\n        string decision;\n        uint256 timestamp;\n        bool exists;\n    }\n\n    mapping(uint256 => HiringRecord) public records;\n    uint256[] public applicationIds;\n\n    event HiringDecisionLogged(\n        uint256 indexed applicationId,\n        bytes32 resumeHash,\n        uint256 score,\n        uint256 fairnessScore,\n        string decision,\n        uint256 timestamp\n    );\n\n    modifier onlyOwner() {\n        require(msg.sender == owner, \"Not authorized\");\n        _;\n    }\n\n    constructor() {\n        owner = msg.sender;\n    }\n\n    function logHiringDecision(\n        uint256 applicationId,\n        bytes32 resumeHash,\n        uint256 score,\n        uint256 fairnessScore,\n        string memory decision\n    ) public onlyOwner {\n        require(!records[applicationId].exists, \"Record already exists\");\n        require(score <= 100, \"Score must be 0-100\");\n        require(fairnessScore <= 100, \"Fairness score must be 0-100\");\n        require(\n            keccak256(bytes(decision)) == keccak256(bytes(\"shortlisted\")) ||\n            keccak256(bytes(decision)) == keccak256(bytes(\"rejected\")),\n            \"Decision must be shortlisted or rejected\"\n        );\n\n        records[applicationId] = HiringRecord({\n            resumeHash: resumeHash,\n            score: score,\n            fairnessScore: fairnessScore,\n            decision: decision,\n            timestamp: block.timestamp,\n            exists: true\n        });\n\n        applicationIds.push(applicationId);\n\n        emit HiringDecisionLogged(\n            applicationId,\n            resumeHash,\n            score,\n            fairnessScore,\n            decision,\n            block.timestamp\n        );\n    }\n\n    function getRecord(uint256 applicationId)\n        public view returns (\n            bytes32 resumeHash,\n            uint256 score,\n            uint256 fairnessScore,\n            string memory decision,\n            uint256 timestamp\n        )\n    {\n        require(records[applicationId].exists, \"Record not found\");\n        HiringRecord memory r = records[applicationId];\n        return (r.resumeHash, r.score, r.fairnessScore, r.decision, r.timestamp);\n    }\n\n    function recordExists(uint256 applicationId) public view returns (bool) {\n        return records[applicationId].exists;\n    }\n\n    function totalRecords() public view returns (uint256) {\n        return applicationIds.length;\n    }\n\n    function transferOwnership(address newOwner) public onlyOwner {\n        require(newOwner != address(0), \"Invalid address\");\n        owner = newOwner;\n    }\n}\n"
+      }
+    }
+  }
+}
