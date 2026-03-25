@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowLeft, Search, ChevronUp, ChevronDown, CheckCircle2,
-  XCircle, Clock, Shield, Users, Sparkles, Download, Filter
+  XCircle, Clock, Shield, Users, Sparkles, Download, Filter, RefreshCw, GitCompare
 } from "lucide-react";
 import { applicationsAPI, jobsAPI, aiAPI } from "../api/client";
 import Sidebar from "../components/Sidebar";
@@ -19,7 +19,9 @@ export default function CandidateRanking() {
   const [sortBy, setSortBy] = useState("final_score");
   const [sortDir, setSortDir] = useState("desc");
   const [analyzing, setAnalyzing] = useState(false);
-  const [statusFilter, setStatusFilter] = useState("all"); // all | shortlisted | pending | rejected
+  const [comparing, setComparing] = useState(false);
+  const [compareResult, setCompareResult] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("all");
 
   useEffect(() => {
     Promise.all([jobsAPI.get(jobId), applicationsAPI.getJobCandidates(jobId)]).then(([j, c]) => {
@@ -31,13 +33,25 @@ export default function CandidateRanking() {
   const runAnalysis = async () => {
     setAnalyzing(true);
     try {
-      await aiAPI.runAnalysis(jobId);
-      toast.success("AI analysis complete!");
+      const res = await aiAPI.runAnalysis(jobId);
+      const { processed, skipped } = res.data;
+      toast.success(`AI analysis done! ${processed} processed${skipped ? `, ${skipped} skipped` : ""}`);
       const [j, c] = await Promise.all([jobsAPI.get(jobId), applicationsAPI.getJobCandidates(jobId)]);
       setJob(j.data); setCandidates(c.data);
     } catch (err) {
       toast.error(err.response?.data?.detail || "Analysis failed");
     } finally { setAnalyzing(false); }
+  };
+
+  const runCompare = async () => {
+    setComparing(true);
+    try {
+      const res = await aiAPI.compare(jobId);
+      setCompareResult(res.data);
+      toast.success("Comparison complete!");
+    } catch (err) {
+      toast.error(err.response?.data?.detail || "Comparison failed");
+    } finally { setComparing(false); }
   };
 
   const handleSort = (col) => {
@@ -122,15 +136,90 @@ export default function CandidateRanking() {
             <h1 className="page-title">{job?.title || "Loading…"}</h1>
             <p className="text-xs text-gray-400">{candidates.length} candidates · {job?.published ? "Published" : "Draft"}</p>
           </div>
-          {!job?.analysis_run && (
-            <button onClick={runAnalysis} disabled={analyzing} className="btn-primary">
-              {analyzing ? "Running AI…" : <><Sparkles className="w-4 h-4" /> Run AI Analysis</>}
+          {/* Run / Re-run AI Analysis — always visible so new candidates get processed */}
+          <button
+            onClick={runAnalysis}
+            disabled={analyzing}
+            id="run-ai-analysis"
+            className="btn-primary flex items-center gap-2"
+          >
+            {analyzing
+              ? <><RefreshCw className="w-4 h-4 animate-spin" /> Running…</>
+              : job?.analysis_run
+                ? <><RefreshCw className="w-4 h-4" /> Re-run AI</>
+                : <><Sparkles className="w-4 h-4" /> Run AI Analysis</>}
+          </button>
+          {/* Compare shortlisted candidates */}
+          {candidates.some(c => ["shortlisted", "under_review", "interview_scheduled"].includes(c.status)) && (
+            <button
+              onClick={runCompare}
+              disabled={comparing}
+              id="compare-candidates"
+              className="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold rounded-xl transition-all shadow-sm disabled:opacity-50"
+            >
+              {comparing
+                ? <><RefreshCw className="w-4 h-4 animate-spin" /> Comparing…</>
+                : <><GitCompare className="w-4 h-4" /> Compare</>}
             </button>
           )}
         </div>
 
         <div className="p-8">
+          {/* ── AI Compare Results Panel ── */}
+          {compareResult && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+              className="mb-6 card p-5 border border-violet-200 bg-gradient-to-br from-violet-50 to-purple-50"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center">
+                    <GitCompare className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-violet-900 text-sm">Gemini Candidate Comparison</h3>
+                    <p className="text-xs text-violet-500">{compareResult.total_candidates} candidates ranked by overall fit</p>
+                  </div>
+                </div>
+                <button onClick={() => setCompareResult(null)} className="text-violet-400 hover:text-violet-600 text-xs px-2 py-1 rounded-lg hover:bg-violet-100 transition-colors">
+                  Dismiss ✕
+                </button>
+              </div>
+              <div className="space-y-2">
+                {(compareResult.comparison?.rankings || compareResult.comparison?.candidates || []).map((c, i) => (
+                  <div key={c.application_id || i} className="bg-white rounded-xl p-3 border border-violet-100 flex items-start gap-3">
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${i === 0 ? "bg-yellow-100 text-yellow-700" :
+                        i === 1 ? "bg-gray-100 text-gray-600" :
+                          i === 2 ? "bg-orange-100 text-orange-700" : "bg-violet-50 text-violet-500"
+                      }`}>#{i + 1}</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-gray-900 text-sm">{c.name || c.candidate_name}</div>
+                      {c.recommendation && <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{c.recommendation}</p>}
+                      {c.strengths?.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1.5">
+                          {c.strengths.slice(0, 3).map((s, si) => <span key={si} className="text-xs px-2 py-0.5 bg-violet-100 text-violet-700 rounded-full">{s}</span>)}
+                        </div>
+                      )}
+                    </div>
+                    {c.overall_score != null && (
+                      <div className="text-right shrink-0">
+                        <div className="text-lg font-bold text-violet-700">{Number(c.overall_score).toFixed(0)}</div>
+                        <div className="text-xs text-gray-400">/ 100</div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {compareResult.comparison?.summary && (
+                <div className="mt-3 bg-violet-100/60 rounded-xl px-3 py-2 border border-violet-200/50">
+                  <p className="text-xs text-violet-700 leading-relaxed">{compareResult.comparison.summary}</p>
+                </div>
+              )}
+            </motion.div>
+          )}
+
           {/* Search + filter + export bar */}
+
           <div className="flex items-center gap-4 mb-6">
             <div className="relative flex-1 max-w-xs">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -149,8 +238,8 @@ export default function CandidateRanking() {
                   id={`status-filter-${opt.value}`}
                   onClick={() => setStatusFilter(opt.value)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${statusFilter === opt.value
-                      ? "bg-white text-primary-700 shadow-sm"
-                      : "text-gray-500 hover:text-gray-700"
+                    ? "bg-white text-primary-700 shadow-sm"
+                    : "text-gray-500 hover:text-gray-700"
                     }`}
                 >
                   {opt.label}

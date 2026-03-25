@@ -56,21 +56,14 @@ async def run_ai_analysis(job_id: int, db: AsyncSession = Depends(get_db), admin
         use_gemini_bias = False
 
     processed = 0
+    errors = []
     for app in apps:
         if not app.resume:
             continue
+        try:
+            app.resume.locked = True
 
-        app.resume.locked = True
-
-        # Run bias detection (Gemini Flash)
-        if use_gemini_bias:
-            bias_result = bias_fn(
-                experience_years=app.resume.experience_years,
-                education=app.resume.education or "",
-                skills=app.resume.skills or [],
-                projects=app.resume.projects or [],
-            )
-        else:
+            # Run bias detection (Gemini Flash)
             bias_result = bias_fn(
                 experience_years=app.resume.experience_years,
                 education=app.resume.education or "",
@@ -78,63 +71,88 @@ async def run_ai_analysis(job_id: int, db: AsyncSession = Depends(get_db), admin
                 projects=app.resume.projects or [],
             )
 
-        # Upsert bias report
-        bias_q = await db.execute(select(BiasReport).where(BiasReport.application_id == app.id))
-        bias_report = bias_q.scalar_one_or_none()
-        if bias_report:
-            bias_report.experience_bias = bias_result["experience_bias"]
-            bias_report.education_bias = bias_result["education_bias"]
-            bias_report.career_gap_bias = bias_result["career_gap_bias"]
-            bias_report.fairness_score = bias_result["fairness_score"]
-            bias_report.bias_details = bias_result.get("details", {})
-        else:
-            bias_report = BiasReport(
-                application_id=app.id,
-                experience_bias=bias_result["experience_bias"],
-                education_bias=bias_result["education_bias"],
-                career_gap_bias=bias_result["career_gap_bias"],
-                fairness_score=bias_result["fairness_score"],
-                bias_details=bias_result.get("details", {}),
-            )
-            db.add(bias_report)
+            # Upsert bias report
+            bias_q = await db.execute(select(BiasReport).where(BiasReport.application_id == app.id))
+            bias_report = bias_q.scalar_one_or_none()
+            if bias_report:
+                bias_report.experience_bias = bias_result["experience_bias"]
+                bias_report.education_bias = bias_result["education_bias"]
+                bias_report.career_gap_bias = bias_result["career_gap_bias"]
+                bias_report.fairness_score = bias_result["fairness_score"]
+                bias_report.bias_details = bias_result.get("details", {})
+            else:
+                bias_report = BiasReport(
+                    application_id=app.id,
+                    experience_bias=bias_result["experience_bias"],
+                    education_bias=bias_result["education_bias"],
+                    career_gap_bias=bias_result["career_gap_bias"],
+                    fairness_score=bias_result["fairness_score"],
+                    bias_details=bias_result.get("details", {}),
+                )
+                db.add(bias_report)
+                await db.flush()
 
-        # Run ranking (Gemini Flash — fast & accurate)
-        job_requirements = job.requirements or job.description or ""
-        fairness_factor = bias_result["fairness_score"] / 100
+            # Run ranking
+            job_requirements = job.requirements or job.description or ""
+            fairness_factor = bias_result["fairness_score"] / 100
 
-        if use_gemini_ranker:
-            ranking_result = rank_fn(
-                skills=app.resume.skills or [],
-                experience_years=app.resume.experience_years,
-                projects=app.resume.projects or [],
-                job_requirements=job_requirements,
-                education=app.resume.education or "",
-                fairness_factor=fairness_factor,
-                raw_text=app.resume.raw_text or "",
-            )
-        else:
-            ranking_result = rank_fn(
-                skills=app.resume.skills or [],
-                experience_years=app.resume.experience_years,
-                projects=app.resume.projects or [],
-                job_requirements=job_requirements,
-                fairness_factor=fairness_factor,
-            )
+            if use_gemini_ranker:
+                ranking_result = rank_fn(
+                    skills=app.resume.skills or [],
+                    experience_years=app.resume.experience_years,
+                    projects=app.resume.projects or [],
+                    job_requirements=job_requirements,
+                    education=app.resume.education or "",
+                    fairness_factor=fairness_factor,
+                    raw_text=app.resume.raw_text or "",
+                )
+            else:
+                ranking_result = rank_fn(
+                    skills=app.resume.skills or [],
+                    experience_years=app.resume.experience_years,
+                    projects=app.resume.projects or [],
+                    job_requirements=job_requirements,
+                    fairness_factor=fairness_factor,
+                )
 
-        # Upsert ranking
-        rank_q = await db.execute(select(Ranking).where(Ranking.application_id == app.id))
-        ranking = rank_q.scalar_one_or_none()
-        if ranking:
-            for k, v in ranking_result.items():
-                if hasattr(ranking, k):
-                    setattr(ranking, k, v)
-        else:
-            ranking = Ranking(application_id=app.id, **{k: v for k, v in ranking_result.items() if k != "explanation"})
-            ranking.explanation = ranking_result.get("explanation", "")
-            db.add(ranking)
+            # Upsert ranking — explicit field mapping (no **kwargs) to avoid passing unknown keys
+            rank_q = await db.execute(select(Ranking).where(Ranking.application_id == app.id))
+            ranking = rank_q.scalar_one_or_none()
+            if ranking:
+                ranking.skill_match_score = ranking_result.get("skill_match_score", ranking.skill_match_score)
+                ranking.experience_score  = ranking_result.get("experience_score",  ranking.experience_score)
+                ranking.project_score     = ranking_result.get("project_score",     ranking.project_score)
+                ranking.diversity_score   = ranking_result.get("diversity_score",   ranking.diversity_score)
+                ranking.soft_skills_score = ranking_result.get("soft_skills_score", ranking.soft_skills_score)
+                ranking.raw_score         = ranking_result.get("raw_score",         ranking.raw_score)
+                ranking.final_score       = ranking_result.get("final_score",       ranking.final_score)
+                ranking.fairness_factor   = ranking_result.get("fairness_factor",   ranking.fairness_factor)
+                ranking.ranking_details   = ranking_result.get("ranking_details",   ranking.ranking_details)
+                ranking.explanation       = ranking_result.get("explanation",       ranking.explanation)
+            else:
+                ranking = Ranking(
+                    application_id=app.id,
+                    skill_match_score=ranking_result.get("skill_match_score", 0),
+                    experience_score=ranking_result.get("experience_score", 0),
+                    project_score=ranking_result.get("project_score", 0),
+                    diversity_score=ranking_result.get("diversity_score", 0),
+                    soft_skills_score=ranking_result.get("soft_skills_score", 0),
+                    raw_score=ranking_result.get("raw_score", 0),
+                    final_score=ranking_result.get("final_score", 0),
+                    fairness_factor=ranking_result.get("fairness_factor", 1.0),
+                    ranking_details=ranking_result.get("ranking_details"),
+                    explanation=ranking_result.get("explanation", ""),
+                )
+                db.add(ranking)
+                await db.flush()
 
-        app.status = "under_review"
-        processed += 1
+            app.status = "under_review"
+            processed += 1
+
+        except Exception as e:
+            errors.append({"application_id": app.id, "error": str(e)})
+            print(f"[AI Analysis] Error on app {app.id}: {e}")
+            await db.rollback()
 
     job.analysis_run = True
     await db.commit()
@@ -144,6 +162,8 @@ async def run_ai_analysis(job_id: int, db: AsyncSession = Depends(get_db), admin
         "message": f"AI analysis completed for {processed} candidates",
         "job_id": job_id,
         "processed": processed,
+        "skipped": len(errors),
+        "errors": errors,
         "model": model_info,
     }
 

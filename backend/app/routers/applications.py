@@ -56,11 +56,14 @@ async def upload_resume(application_id: int, file: UploadFile = File(...),
     if not app:
         raise HTTPException(status_code=404, detail="Application not found")
 
-    # Check job analysis not run yet
+    # Only block RE-uploads after analysis has run (prevents score gaming).
+    # First-time uploads are always allowed so new candidates aren't locked out.
     job_result = await db.execute(select(Job).where(Job.id == app.job_id))
     job = job_result.scalar_one_or_none()
     if job and job.analysis_run:
-        raise HTTPException(status_code=400, detail="Resume locked — AI analysis already run")
+        existing_check = await db.execute(select(Resume).where(Resume.application_id == application_id))
+        if existing_check.scalar_one_or_none():
+            raise HTTPException(status_code=400, detail="Resume locked — AI analysis already run")
 
     if file.content_type not in ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]:
         raise HTTPException(status_code=400, detail="Only PDF and DOCX files allowed")

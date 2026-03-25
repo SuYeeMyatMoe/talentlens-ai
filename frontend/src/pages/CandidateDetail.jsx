@@ -315,13 +315,7 @@ function ScheduleInterviewModal({ appId, candidateName, jobTitle, onClose, onSch
                         <span className="font-medium text-gray-900">{result.location}</span>
                       </div>
                     )}
-                    <div className="flex items-center gap-3 text-sm">
-                      <Send className="w-4 h-4 text-gray-400 shrink-0" />
-                      <span className="text-gray-500 w-24 shrink-0">Email:</span>
-                      <span className={`font-medium text-xs ${result.email_sent ? "text-green-600" : "text-gray-500"}`}>
-                        {result.email_sent ? (result.email_simulated ? "Simulated (SMTP not configured)" : "Sent ✓") : "Not sent"}
-                      </span>
-                    </div>
+
                   </div>
                   <button onClick={onClose} className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-sm hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md">
                     Done
@@ -654,24 +648,69 @@ export default function CandidateDetail() {
 
               {/* Blockchain record */}
               {data.blockchain_verified && data.transaction_hash && (
-                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="card p-6 border-green-100 bg-green-50">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Link2 className="w-4 h-4 text-green-600" />
-                    <h3 className="font-semibold text-green-800">Blockchain Verification Record</h3>
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="card p-6 border border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50"
+                >
+                  {/* Header */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center shrink-0">
+                        <Shield className="w-4 h-4 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-emerald-900 text-sm leading-tight">Blockchain Verification Record</h3>
+                        <p className="text-xs text-emerald-600 mt-0.5">Immutable hiring decision log</p>
+                      </div>
+                    </div>
+                    {/* Network live badge */}
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-100 border border-emerald-200 shrink-0">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-xs font-semibold text-emerald-700">Local Hardhat</span>
+                    </div>
                   </div>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="text-green-600 font-medium">Tx Hash:</span>
-                      <code className="font-mono text-xs text-green-800 bg-white px-2 py-0.5 rounded border border-green-100 break-all">{data.transaction_hash}</code>
+
+                  <div className="space-y-3">
+                    {/* Tx Hash box */}
+                    <div className="bg-white rounded-xl p-3 border border-emerald-100">
+                      <div className="flex items-center gap-1 text-xs text-emerald-600 font-semibold mb-1.5">
+                        <Link2 className="w-3 h-3" /> Tx Hash
+                      </div>
+                      <code className="font-mono text-xs text-gray-800 break-all leading-relaxed">
+                        {data.transaction_hash}
+                      </code>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-green-600 font-medium">Network:</span>
-                      <span className="text-green-800">Polygon Mumbai Testnet</span>
+
+                    {/* Network / RPC row */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="bg-white rounded-xl p-3 border border-emerald-100">
+                        <div className="text-xs text-emerald-600 font-semibold mb-1">Network</div>
+                        <div className="text-xs font-medium text-gray-800">Hardhat Local Node</div>
+                        <div className="text-xs text-gray-400 mt-0.5">chainId: 31337</div>
+                      </div>
+                      <div className="bg-white rounded-xl p-3 border border-emerald-100">
+                        <div className="text-xs text-emerald-600 font-semibold mb-1">RPC Endpoint</div>
+                        <div className="text-xs font-mono text-gray-800">127.0.0.1:8545</div>
+                        <div className="text-xs text-gray-400 mt-0.5">Zero gas cost</div>
+                      </div>
                     </div>
-                    <a href={`https://mumbai.polygonscan.com/tx/${data.transaction_hash}`} target="_blank" rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs text-green-700 underline">
-                      View on PolygonScan ↗
-                    </a>
+
+                    {/* Confirmed pill */}
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <span className="text-xs text-emerald-700 font-medium">
+                        Decision permanently recorded on-chain — tamper-proof &amp; auditable
+                      </span>
+                    </div>
+
+                    {/* Info note */}
+                    <div className="bg-emerald-100/60 rounded-xl px-3 py-2 border border-emerald-200/50">
+                      <p className="text-xs text-emerald-700 leading-relaxed">
+                        <span className="font-semibold">ℹ️ Local blockchain</span> — Running on Hardhat EDR.
+                        No MATIC needed. For production, redeploy to Polygon Mainnet (~$0.01/decision).
+                      </p>
+                    </div>
                   </div>
                 </motion.div>
               )}
