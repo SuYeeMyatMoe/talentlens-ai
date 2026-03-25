@@ -1,39 +1,4 @@
-
 <h1 align="center">🔍 TalentLens AI: The Future of Fair Recruitment</h1>
-<div align="center">
-
-### 🎥 Live Demo Presentation
-
-▶ **Watch the full platform demo here:**  
-https://youtu.be/c-3yRsB1Ug4
-
-<br>
-
-<a href="https://youtu.be/c-3yRsB1Ug4">
-<img src="https://img.shields.io/badge/▶_Watch_Full_Demo-YouTube-red?style=for-the-badge&logo=youtube">
-</a>
-</div>
-
----
-
-## 📐 UI Prototype
-
-<div align="center">
-
-Early **Figma concept** used to visualize the TalentLens AI interface and user flow.
-
-⚠️ **Design sketch only and it is not the complete final UI.**
-
-🔗 https://sky-sadly-16861013.figma.site
-
-<br>
-
-<a href="https://sky-sadly-16861013.figma.site">
-<img src="https://img.shields.io/badge/View_UI_Prototype-Figma-ff7262?style=for-the-badge&logo=figma">
-</a>
-
-</div>
-
 <div align="center">
 
 ![Status](https://img.shields.io/badge/Status-Hackathon_Ready-7c3aed?style=for-the-badge&logo=github)
@@ -363,3 +328,35 @@ INTERVIEW_WORKFLOW_ENABLED=true
 Built with ❤️ for Hackathon 2026  |  TalentLens AI  |  Fair Hiring for Everyone
 </div>
 
+<div align="center">
+🎥 Live Demo Presentation
+
+▶ **Watch the full platform demo here:**  
+https://youtu.be/c-3yRsB1Ug4
+
+<br>
+
+<a href="https://youtu.be/c-3yRsB1Ug4">
+<img src="https://img.shields.io/badge/▶_Watch_Full_Demo-YouTube-red?style=for-the-badge&logo=youtube">
+</a>
+</div>
+
+---
+
+## 📐 UI Prototype
+
+<div align="center">
+
+Early **Figma concept** used to visualize the TalentLens AI interface and user flow.
+
+⚠️ **Design sketch only and it is not the complete final UI.**
+
+🔗 https://sky-sadly-16861013.figma.site
+
+<br>
+
+<a href="https://sky-sadly-16861013.figma.site">
+<img src="https://img.shields.io/badge/View_UI_Prototype-Figma-ff7262?style=for-the-badge&logo=figma">
+</a>
+
+</div>
