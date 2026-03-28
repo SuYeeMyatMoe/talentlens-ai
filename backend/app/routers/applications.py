@@ -163,6 +163,7 @@ async def get_job_candidates(job_id: int, db: AsyncSession = Depends(get_db), ad
             bias_report=a.bias_report,
             blockchain_verified=bool(a.blockchain_log and a.blockchain_log.transaction_hash),
             transaction_hash=a.blockchain_log.transaction_hash if a.blockchain_log else None,
+            resume_hash=a.blockchain_log.resume_hash if a.blockchain_log else None,
         ))
     return out
 
@@ -206,6 +207,7 @@ async def get_candidate_detail(application_id: int, db: AsyncSession = Depends(g
         bias_report=app.bias_report if (current_user.role == "admin" or decision_made) else None,
         blockchain_verified=bool(app.blockchain_log and app.blockchain_log.transaction_hash),
         transaction_hash=app.blockchain_log.transaction_hash if app.blockchain_log else None,
+        resume_hash=app.blockchain_log.resume_hash if app.blockchain_log else None,
         decision_visible=decision_made,
     )
 

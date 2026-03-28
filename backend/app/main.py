@@ -10,6 +10,7 @@ from app.routers.applications import router as applications_router
 from app.routers.ai_analysis import router as ai_analysis_router
 from app.routers.notifications import router as notifications_router
 from app.routers.interviews import router as interviews_router
+from app.routers.blockchain import router as blockchain_router
 
 app = FastAPI(
     title="TalentLens AI",
@@ -33,6 +34,7 @@ app.include_router(applications_router)
 app.include_router(ai_analysis_router)
 app.include_router(notifications_router)
 app.include_router(interviews_router)
+app.include_router(blockchain_router)
 
 # Serve uploaded files
 os.makedirs("uploads", exist_ok=True)

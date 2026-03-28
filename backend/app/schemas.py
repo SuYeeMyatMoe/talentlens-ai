@@ -176,6 +176,7 @@ class CandidateDetailResponse(BaseModel):
     bias_report: Optional[BiasReportResponse] = None
     blockchain_verified: bool = False
     transaction_hash: Optional[str] = None
+    resume_hash: Optional[str] = None          # on-chain resume fingerprint
     decision_visible: bool = True
 
 

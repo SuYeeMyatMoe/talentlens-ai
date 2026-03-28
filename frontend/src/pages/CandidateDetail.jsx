@@ -4,16 +4,81 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, CheckCircle2, XCircle, Shield, Brain, Link2,
   Briefcase, GraduationCap, Code2, Star, AlertTriangle, Sparkles,
-  Calendar, Clock, Video, MapPin, Send, Loader2, X, ChevronRight
+  Calendar, Clock, Video, MapPin, Send, Loader2, X, ChevronRight,
+  Hash, Copy, Eye, EyeOff
 } from "lucide-react";
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, Tooltip } from "recharts";
 import { applicationsAPI, interviewsAPI } from "../api/client";
 import { useAuth } from "../contexts/AuthContext";
 import Sidebar from "../components/Sidebar";
 import ScoreCircle from "../components/ScoreCircle";
+import BlockchainVerifyModal from "../components/BlockchainVerifyModal";
 import toast from "react-hot-toast";
 
-// ─── Interview Scheduling Modal ────────────────────────────────────────────────
+// ─── Resume Hash Row ────────────────────────────────────────────────────────────
+function ResumeHashRow({ resumeHash }) {
+  const [copied, setCopied] = useState(false);
+
+  // Normalise: always have the full 64-char hex (without 0x) for display,
+  // and with 0x when copying so it matches the modal's on-chain format.
+  const withPrefix = resumeHash
+    ? (resumeHash.startsWith("0x") ? resumeHash : "0x" + resumeHash)
+    : "";
+  // Display without 0x — cleaner for the card
+  const displayHash = withPrefix.slice(2); // strips exactly "0x"
+
+  const handleCopy = () => {
+    // Copy WITHOUT 0x so what is copied matches what is displayed
+    navigator.clipboard.writeText(displayHash);
+    setCopied(true);
+    toast.success("Resume hash copied!");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  if (!displayHash) return null;
+
+  return (
+    <div className="bg-white rounded-xl p-3 border border-emerald-100">
+      {/* Label row */}
+      <div className="flex items-center justify-between mb-1.5">
+        <div className="flex items-center gap-1 text-xs text-emerald-600 font-semibold">
+          <Hash className="w-3 h-3" /> Resume Hash
+          <span className="ml-1 text-xs font-normal text-emerald-400">(SHA-256)</span>
+        </div>
+        <button
+          onClick={handleCopy}
+          className="flex items-center gap-1 text-xs transition-colors px-2 py-0.5 rounded-lg border"
+          style={copied
+            ? { color: "#16a34a", borderColor: "#bbf7d0", background: "#f0fdf4" }
+            : { color: "#059669", borderColor: "#d1fae5", background: "white" }
+          }
+        >
+          {copied
+            ? <CheckCircle2 className="w-3 h-3" />
+            : <Copy className="w-3 h-3" />
+          }
+          {copied ? "Copied!" : "Copy"}
+        </button>
+      </div>
+
+      {/* Hash value — no 0x prefix for cleaner display */}
+      <code
+        onClick={handleCopy}
+        title="Click to copy"
+        className="font-mono text-xs text-gray-800 break-all leading-relaxed cursor-pointer hover:text-emerald-700 transition-colors select-all"
+      >
+        {displayHash}
+      </code>
+
+      {/* Helper tip */}
+      <p className="text-xs text-gray-400 mt-1.5 leading-snug">
+        This is the cryptographic fingerprint of your resume stored on-chain.
+        Open <strong className="text-emerald-600">Verify My Record</strong> to confirm it matches.
+      </p>
+    </div>
+  );
+}
+
 function ScheduleInterviewModal({ appId, candidateName, jobTitle, onClose, onScheduled }) {
   const [step, setStep] = useState(1); // 1=Form, 2=Result
   const [mode, setMode] = useState("online");
@@ -339,6 +404,7 @@ export default function CandidateDetail() {
   const [loading, setLoading] = useState(true);
   const [deciding, setDeciding] = useState(null);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [interview, setInterview] = useState(null);
 
   const fetchData = () =>
@@ -425,6 +491,20 @@ export default function CandidateDetail() {
               <CheckCircle2 className="w-4 h-4 text-green-500" />
               <span className="text-xs text-green-700 font-semibold">Blockchain Verified</span>
             </div>
+          )}
+
+          {/* ── Verify My Record button (candidate after decision, admin always) */}
+          {data.blockchain_verified && (
+            <button
+              id="verify-blockchain-btn"
+              onClick={() => setShowVerifyModal(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold
+                bg-gradient-to-r from-emerald-600 to-teal-600 text-white
+                hover:from-emerald-700 hover:to-teal-700 transition-all shadow-sm"
+            >
+              <Shield className="w-4 h-4" />
+              Verify My Record
+            </button>
           )}
 
           {/* Admin action buttons */}
@@ -674,13 +754,26 @@ export default function CandidateDetail() {
                   <div className="space-y-3">
                     {/* Tx Hash box */}
                     <div className="bg-white rounded-xl p-3 border border-emerald-100">
-                      <div className="flex items-center gap-1 text-xs text-emerald-600 font-semibold mb-1.5">
-                        <Link2 className="w-3 h-3" /> Tx Hash
+                      <div className="flex items-center justify-between mb-1.5">
+                        <div className="flex items-center gap-1 text-xs text-emerald-600 font-semibold">
+                          <Link2 className="w-3 h-3" /> Tx Hash
+                        </div>
+                        <button
+                          onClick={() => { navigator.clipboard.writeText(data.transaction_hash); toast.success("Tx hash copied!"); }}
+                          className="text-xs text-emerald-500 hover:text-emerald-700 flex items-center gap-1 transition-colors"
+                        >
+                          <ChevronRight className="w-3 h-3" /> Copy
+                        </button>
                       </div>
                       <code className="font-mono text-xs text-gray-800 break-all leading-relaxed">
                         {data.transaction_hash}
                       </code>
                     </div>
+
+                    {/* Resume Hash box — NEW */}
+                    {data.resume_hash && (
+                      <ResumeHashRow resumeHash={data.resume_hash} />
+                    )}
 
                     {/* Network / RPC row */}
                     <div className="grid grid-cols-2 gap-2">
@@ -714,6 +807,7 @@ export default function CandidateDetail() {
                   </div>
                 </motion.div>
               )}
+
             </div>
           </div>
         </div>
@@ -727,6 +821,14 @@ export default function CandidateDetail() {
           jobTitle="Position"
           onClose={() => setShowScheduleModal(false)}
           onScheduled={handleScheduled}
+        />
+      )}
+
+      {/* Blockchain Verification Modal */}
+      {showVerifyModal && (
+        <BlockchainVerifyModal
+          appId={appId}
+          onClose={() => setShowVerifyModal(false)}
         />
       )}
     </div>

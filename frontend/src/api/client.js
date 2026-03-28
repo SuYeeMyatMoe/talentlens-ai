@@ -94,4 +94,9 @@ export const notificationsAPI = {
   markAllRead: () => api.put("/api/notifications/mark-all-read"),
 };
 
+// ─── Blockchain Verification ───────────────────────────────────────────────────
+export const blockchainAPI = {
+  verify: (appId) => api.get(`/api/blockchain/verify/${appId}`),
+};
+
 export default api;
