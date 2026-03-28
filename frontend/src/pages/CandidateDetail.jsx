@@ -5,7 +5,7 @@ import {
   ArrowLeft, CheckCircle2, XCircle, Shield, Brain, Link2,
   Briefcase, GraduationCap, Code2, Star, AlertTriangle, Sparkles,
   Calendar, Clock, Video, MapPin, Send, Loader2, X, ChevronRight,
-  Hash, Copy, Eye, EyeOff
+  Hash, Copy, Eye, EyeOff, Download
 } from "lucide-react";
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, Tooltip } from "recharts";
 import { applicationsAPI, interviewsAPI } from "../api/client";
@@ -406,6 +406,7 @@ export default function CandidateDetail() {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [interview, setInterview] = useState(null);
+  const [downloading, setDownloading] = useState(false);
 
   const fetchData = () =>
     applicationsAPI.getDetail(appId).then(r => setData(r.data)).catch(console.error).finally(() => setLoading(false));
@@ -434,6 +435,27 @@ export default function CandidateDetail() {
     fetchData();
     fetchInterview();
     toast.success("Interview successfully scheduled! Candidate notified.");
+  };
+
+  const handleDownloadResume = async () => {
+    setDownloading(true);
+    try {
+      const res = await applicationsAPI.downloadResume(appId);
+      const contentDisposition = res.headers["content-disposition"] || "";
+      const match = contentDisposition.match(/filename="?([^"]+)"?/);
+      const filename = match ? match[1] : `resume_${appId}.pdf`;
+      const url = URL.createObjectURL(new Blob([res.data], { type: res.headers["content-type"] }));
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("Resume downloaded!");
+    } catch (err) {
+      toast.error(err.response?.data?.detail || "Could not download resume");
+    } finally {
+      setDownloading(false);
+    }
   };
 
   const backPath = user?.role === "admin" ? -1 : "/candidate";
@@ -594,6 +616,22 @@ export default function CandidateDetail() {
                     <div className="text-sm text-gray-400">{data.candidate_email}</div>
                   </div>
                 </div>
+
+                {/* Download Resume — admin only */}
+                {user?.role === "admin" && (
+                  <button
+                    id="download-resume-btn"
+                    onClick={handleDownloadResume}
+                    disabled={downloading}
+                    className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-xl text-sm font-semibold
+                      bg-gradient-to-r from-violet-600 to-indigo-600 text-white
+                      hover:from-violet-700 hover:to-indigo-700 transition-all shadow-sm disabled:opacity-60"
+                  >
+                    {downloading
+                      ? <><Loader2 className="w-4 h-4 animate-spin" /> Downloading…</>
+                      : <><Download className="w-4 h-4" /> Download Resume</>}
+                  </button>
+                )}
 
                 {data.resume && (
                   <div className="space-y-3 border-t border-gray-100 pt-4">

@@ -2,6 +2,7 @@ import os
 import hashlib
 import aiofiles
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -112,6 +113,41 @@ async def upload_resume(application_id: int, file: UploadFile = File(...),
     await db.refresh(resume)
 
     return {"message": "Resume uploaded and parsed", "resume_id": resume.id, "parsed": parsed}
+
+
+@router.get("/{application_id}/download-resume")
+async def download_resume(
+    application_id: int,
+    db: AsyncSession = Depends(get_db),
+    admin: User = Depends(get_current_admin),
+):
+    """Allow recruiter (admin) to download the original resume file."""
+    result = await db.execute(
+        select(Application)
+        .options(selectinload(Application.user))
+        .where(Application.id == application_id)
+    )
+    app = result.scalar_one_or_none()
+    if not app:
+        raise HTTPException(status_code=404, detail="Application not found")
+
+    # Verify the admin created this job
+    job_result = await db.execute(select(Job).where(Job.id == app.job_id))
+    job = job_result.scalar_one_or_none()
+    if not job or job.created_by != admin.id:
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    # Try both pdf and docx extensions
+    candidate_name = (app.user.name or "resume").replace(" ", "_")
+    for ext in ("pdf", "docx"):
+        filename = f"resume_{application_id}_{app.user_id}.{ext}"
+        filepath = os.path.join(UPLOAD_DIR, filename)
+        if os.path.exists(filepath):
+            media_type = "application/pdf" if ext == "pdf" else "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            download_name = f"{candidate_name}_resume.{ext}"
+            return FileResponse(path=filepath, media_type=media_type, filename=download_name)
+
+    raise HTTPException(status_code=404, detail="Resume file not found on server")
 
 
 @router.get("/my", response_model=List[ApplicationResponse])

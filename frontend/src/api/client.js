@@ -67,6 +67,9 @@ export const applicationsAPI = {
 
   makeDecision: (appId, decision) =>
     api.post(`/api/applications/${appId}/decision`, { decision }),
+
+  downloadResume: (appId) =>
+    api.get(`/api/applications/${appId}/download-resume`, { responseType: "blob" }),
 };
 
 // ─── AI Analysis ──────────────────────────────────────────────────────────────
