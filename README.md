@@ -2,7 +2,7 @@
 <div align="center">
 
 ![Status](https://img.shields.io/badge/Status-Hackathon_Ready-7c3aed?style=for-the-badge&logo=github)
-![Blockchain](https://img.shields.io/badge/Network-Polygon_Mumbai-8247e5?style=for-the-badge&logo=polygon)
+![Blockchain](https://img.shields.io/badge/Blockchain-Hardhat_Local_+_Polygon-8247e5?style=for-the-badge&logo=polygon)
 ![AI](https://img.shields.io/badge/AI-Gemini_%7C_spaCy-2563eb?style=for-the-badge&logo=google)
 ![Stack](https://img.shields.io/badge/Stack-React_%7C_FastAPI_%7C_MySQL-dc2626?style=for-the-badge)
 
@@ -40,7 +40,7 @@
 ### ⛓️ Blockchain-Verified Decisions
 <img src="./projectUI_images/Resume_AiAnalysiswithBlockchain_AfterDecision.png" width="850" alt="Blockchain Verification"/>
 
-*Every decision is securely hashed to the Polygon network for an immutable audit trail.*
+*Every decision is cryptographically recorded on a blockchain (local) for an immutable audit trail*
 
 ---
 
@@ -191,32 +191,92 @@ The final stage produces recruiter-facing and candidate-facing explanations, inc
 
 ## ⛓️ Blockchain Architecture
 
-**Trustless Data Integrity on Polygon Mumbai**
+**Hybrid Blockchain Design — Local Development + Production-Ready Deployment**
 
-Polygon was chosen over Ethereum mainnet because it is fully EVM-compatible while keeping transaction costs extremely low, making per-decision logging practical for real recruitment workflows.
+TalentLens AI uses an EVM-compatible blockchain to create a **tamper-proof, auditable record of hiring decisions**. 
 
-**The Contract — `TalentLensHiring.sol`**
+Instead of relying solely on a live public network, the system is designed with a **flexible deployment model**:
 
-```solidity
-struct HiringRecord {
-    bytes32 resumeHash;    // SHA-256 fingerprint of parsed resume JSON
-    uint256 score;         // AI score × 100
-    uint256 fairnessScore; // Fairness score × 100
-    string  decision;      // "shortlisted" or "rejected"
-    uint256 timestamp;     // Immutable block timestamp
-    address recorder;      // Recruiter wallet address
-    bool    exists;
-}
-mapping(uint256 => HiringRecord) private records;
-```
+- 🧪 **Local Hardhat Network (Default for Hackathon)**
+- 🌐 **Polygon Mainnet (Production Ready)**
+- 🔁 **Deterministic Simulation Mode (Fallback)**
 
-**The Process**
+This ensures the platform works **without external dependencies**, while remaining fully **deployable to real blockchain infrastructure**.
 
-1. Recruiter clicks **Log to Blockchain**
-2. Backend computes `SHA-256(resume JSON)` and produces `resumeHash`
-3. `logHiringDecision()` writes the record to Polygon permanently and immutably
-4. Transaction hash is returned and displayed as a **Verified badge** on the candidate profile
-5. Anyone can call `verifyRecord(appId, hash)` to confirm the decision was not altered
+---
+
+### 🔐 What Gets Stored On-Chain?
+
+Each hiring decision writes the following immutable record:
+
+- Application ID  
+- Resume hash (SHA-256 fingerprint)  
+- AI score (0–100)  
+- Fairness score (0–100)  
+- Final decision (shortlisted / rejected)  
+- Timestamp (block time)  
+
+---
+
+### ⚙️ Decision Logging Workflow
+
+1. Recruiter clicks **Shortlist** or **Reject**
+2. Backend computes:
+   - `resume_hash = SHA-256(resume content)`
+   - `score = AI ranking score`
+   - `fairness_score = bias-adjusted score`
+3. Backend calls `blockchain_service.log_decision()`
+4. Smart contract stores the record immutably
+5. Transaction hash is returned and stored
+6. UI displays a **Blockchain Verification Record**
+
+---
+
+### 🧱 Smart Contract Guarantees
+
+- ✅ Records **cannot be overwritten**
+- ✅ Scores are **validated (0–100 range)**
+- ✅ Only valid decisions allowed
+- ✅ Only authorized account can write
+- ✅ Each record is timestamped and event-logged
+
+---
+
+### 🧪 Execution Modes
+
+| Mode | Status | Real Blockchain | Cost | Notes |
+|------|--------|---------------|------|------|
+| **Hardhat Local Node** | confirmed | ✅ Yes (local) | Free | Default hackathon mode |
+| **Simulation Mode** | simulated | ❌ No | Free | Deterministic hash fallback |
+| **Polygon Mainnet** | confirmed | ✅ Yes | ~$0.001–0.01 | Production ready |
+
+---
+
+### 🚀 Why Not Use Mainnet in Demo?
+
+- Requires real cryptocurrency (MATIC)
+- Needs secure private key handling
+- RPC providers may require paid plans
+- Transactions are slower and irreversible
+
+---
+
+### 💡 Why This Design Matters
+
+**1. Tamper-Proof Decisions**  
+Once recorded, scores and decisions cannot be altered — eliminating post-hoc justification.
+
+**2. AI Accountability**  
+Fairness scores are permanently stored, enabling bias audits.
+
+**3. Compliance Ready**  
+Supports explainability and auditability required by modern regulations.
+
+**4. Candidate Trust**  
+Users can verify decisions independently using transaction hashes.
+
+**5. Fault Tolerance**  
+No reliance on a single centralized database.
 
 ---
 
@@ -230,7 +290,7 @@ mapping(uint256 => HiringRecord) private records;
 6. Recruiters filter candidates by status, shortlist, or ranking score
 7. Shortlisted candidates can be exported as CSV for HR reporting
 8. Interview scheduling or interview-stage updates are managed in the workflow
-9. Final decisions are logged to the Polygon blockchain
+9. Final decisions are logged to the blockchain
 10. Candidates receive transparent feedback and status updates
 
 ---
@@ -288,17 +348,13 @@ npm run dev
 # App: http://localhost:3000
 ```
 
-### 3 — Blockchain (Optional)
+### 3 — Blockchain (Recommended: Local Hardhat)
 
-Deploy the smart contract to Polygon Mumbai testnet:
+Run a local blockchain node:
 
 ```bash
 cd smart_contracts
-npm install
-npx hardhat run deploy.js --network mumbai
-# Output: Contract deployed to: 0xABC123...
-# Copy this address into backend .env as CONTRACT_ADDRESS
-# Free test MATIC: https://faucet.polygon.technology
+npx hardhat node
 ```
 
 > If `CONTRACT_ADDRESS` and `PRIVATE_KEY` are not configured, the system runs in **demo mode** automatically. A deterministic mock transaction hash is generated so the user experience remains visually consistent without requiring a real wallet or testnet deployment.
@@ -312,16 +368,14 @@ UPLOAD_DIR=uploads
 GEMINI_API_KEY=your-gemini-key
 ALLOWED_ORIGINS=http://localhost:3000
 
-# Blockchain — optional for demo mode
-WEB3_PROVIDER_URL=https://rpc-mumbai.maticvigil.com
-PRIVATE_KEY=your-wallet-private-key
-CONTRACT_ADDRESS=0xYourDeployedContract
-CHAIN_ID=80001
+# Blockchain (Local Default)
+BLOCKCHAIN_RPC_URL=http://127.0.0.1:8545
+CONTRACT_ADDRESS=0xYourContractAddress
 
-# Optional workflow/export configuration
-CSV_EXPORT_ENABLED=true
-INTERVIEW_WORKFLOW_ENABLED=true
----
+# Optional (Production)
+POLYGON_RPC_URL=https://polygon-rpc.com
+PRIVATE_KEY=your-wallet-private-key
+CHAIN_ID=137
 ```
 <div align="center">
 
