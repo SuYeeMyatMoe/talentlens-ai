@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     PRIVATE_KEY: str = ""
     CONTRACT_ADDRESS: str = ""
 
-    CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
+    CORS_ORIGINS: str = "http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:3000"
     MAX_UPLOAD_SIZE: int = 10 * 1024 * 1024  # 10MB
     APP_ENV: str = "development"
     FRONTEND_URL: str = "http://localhost:5173"

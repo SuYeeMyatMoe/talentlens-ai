@@ -6,21 +6,26 @@ const api = axios.create({
   baseURL: API_BASE
 });
 
-// Attach token
+// Attach token — read from sessionStorage so each tab has its own independent session
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-// Handle 401
+// Handle 401 — clear this tab's sessionStorage only, then let ProtectedRoute redirect.
 api.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err.response?.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.location.href = "/login";
+      // Only clear if there was actually a token (avoid redirect loops on the login page itself)
+      const hadToken = !!sessionStorage.getItem("token");
+      if (hadToken) {
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("user");
+        // AuthContext reads sessionStorage on init; page reload will show login.
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(err);
   }
