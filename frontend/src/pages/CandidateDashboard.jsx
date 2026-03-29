@@ -322,8 +322,8 @@ export default function CandidateDashboard() {
             <div className="grid grid-cols-3 gap-5">
               {[
                 { label: "Applied", value: myApps.length, icon: FileText, color: "bg-primary-50 text-primary-600" },
-                { label: "Under Review", value: myApps.filter(a => a.status === "under_review").length, icon: Sparkles, color: "bg-blue-50 text-blue-600" },
-                { label: "Shortlisted", value: myApps.filter(a => a.status === "shortlisted").length, icon: CheckCircle2, color: "bg-green-50 text-green-600" },
+                { label: "Under Review", value: myApps.filter(a => ["under_review", "applied"].includes(a.status)).length, icon: Sparkles, color: "bg-blue-50 text-blue-600" },
+                { label: "Shortlisted", value: myApps.filter(a => ["shortlisted", "interview_scheduled", "interview_completed", "hired"].includes(a.status)).length, icon: CheckCircle2, color: "bg-green-50 text-green-600" },
               ].map((s, i) => (
                 <motion.div key={s.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
                   className="stat-card">
@@ -435,8 +435,8 @@ export default function CandidateDashboard() {
                         id={`filter-${opt.value}`}
                         onClick={() => setJobFilter(opt.value)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${jobFilter === opt.value
-                            ? "bg-primary-600 text-white"
-                            : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                          ? "bg-primary-600 text-white"
+                          : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                           }`}
                       >
                         {opt.label}

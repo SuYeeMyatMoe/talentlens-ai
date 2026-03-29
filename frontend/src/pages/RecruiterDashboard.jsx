@@ -156,7 +156,7 @@ export default function RecruiterDashboard() {
   const statCards = stats ? [
     { label: "Total Candidates", value: stats.total_candidates, icon: Users, color: "bg-primary-50 text-primary-600", delta: "+12%" },
     { label: "Active Jobs", value: stats.total_jobs, icon: Briefcase, color: "bg-blue-50 text-blue-600", delta: "+3" },
-    { label: "Shortlisted", value: stats.shortlisted, icon: CheckCircle2, color: "bg-green-50 text-green-600", delta: `${stats.total_candidates ? Math.round(stats.shortlisted / stats.total_candidates * 100) : 0}%` },
+    { label: "Shortlisted", value: stats.shortlisted, icon: CheckCircle2, color: "bg-green-50 text-green-600", delta: `${stats.total_candidates ? Math.min(Math.round(stats.shortlisted / stats.total_candidates * 100), 100) : 0}%` },
     { label: "Avg Fairness", value: `${stats.avg_fairness_score}%`, icon: TrendingUp, color: "bg-violet-50 text-violet-600", delta: "+2.1%" },
   ] : [];
 
